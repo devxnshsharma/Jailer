@@ -17,7 +17,7 @@ Players can enter a responsive, replayable action game where combat resources, c
 <!-- Only work verified by the current repository evidence is listed as validated. -->
 
 - ✓ Deterministic gameplay helpers for health, meter, cooldowns, combos, mission progress, and score are implemented in `src/game/logic.ts` and covered by the current test suite.
-- ✓ `npm test` passes the existing `tests/logic.test.ts` suite: 1 test file and 8 tests passed.
+- ✓ `npm test` passes the gameplay logic and mission-manager suites: 2 test files and 10 tests passed.
 - ✓ `npm run typecheck` and `npm run build` complete successfully and produce the Vite `dist/` artifact.
 
 ### Active
@@ -44,7 +44,7 @@ Players can enter a responsive, replayable action game where combat resources, c
 - Existing modules cover `Hero`, `Enemy`, and `Boss` entities; `City`; `WeatherSystem`; post-processing; `InputManager`, definitions, audio, effects, types, and deterministic logic; `MissionManager`; `Hud`; `Screens`; and the `Game` orchestrator mounted by `src/main.ts`.
 - `demo-folder/` is attached reference material only. It is ignored, not bundled, and not edited; its GTA/re3 source and assets are not copied into the original web game.
 - Verification performed during the current documentation pass:
-  - `npm test -- --run tests/logic.test.ts` passes all 8 logic tests.
+  - `npm test -- --run` passes 2 test files and 10 tests.
   - `npm run typecheck` passes.
   - `npm run build` passes and emits `dist/` through Vite.
   - A built-in browser smoke attempt was inconclusive because the local page load timed out; no browser interaction is marked complete until it is independently observed.
