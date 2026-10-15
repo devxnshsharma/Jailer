@@ -136,6 +136,14 @@ tests/logic.test.ts     Vitest coverage for deterministic rules
 .planning/              GSD project context, requirements, roadmap, and state
 ```
 
+## Reference material boundary
+
+`demo-folder/` is an attached, read-only reference project. It is intentionally
+ignored by the application repository and is not imported, bundled, or edited
+by the Vite game. Its high-level ideas—separate world/model/audio systems,
+rain droplets, colour filtering, camera polish, and mission-driven flow—were
+reinterpreted as original TypeScript/Three.js systems under `src/`.
+
 ## Planning documentation
 
 The generated project context is in `.planning/`:
