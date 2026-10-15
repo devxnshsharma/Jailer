@@ -7,9 +7,11 @@
 
 The ingest set contained no source requirements, so these v1 requirements are derived from the current repository and the requested planning scope.
 
-- `npm test`: **pass** — 1 file and 8 tests passed.
+- `npm test -- --run`: **pass** — 2 files and 10 tests passed.
 - `npm run typecheck`: **pass**.
 - `npm run build`: **pass** — Vite emits the production `dist/` artifact.
+- `npm run preview -- --host 0.0.0.0 --port 4174`: **pass** — the built app returned HTTP 200 for `/`.
+- Docker image build: **not run** because the local Docker daemon was unavailable.
 - Built-in browser smoke: **inconclusive** because the local page load timed out; interactive completion remains pending independent observation.
 
 ## v1 Requirements

@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-10-15)
 Phase: 2 of 3 (Browser Entry & Playable Orchestration)
 Plan: 0 of 1 in current phase
 Status: Ready to plan
-Last activity: 2026-10-15 — Inspected the empty ingest intel and repository baseline; recorded the verified logic/test foundation and pending browser integration.
+Last activity: 2026-10-15 — Integrated the browser game, deepened the cinematic character/story presentation, added mission tests, and verified typecheck/build/preview locally; browser panel is currently paused.
 
 Progress: [███░░░░░░░] 33% (1 of 3 roadmap phases complete)
 
@@ -55,17 +55,17 @@ Progress: [███░░░░░░░] 33% (1 of 3 roadmap phases complete)
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- Phase 1: `src/game/logic.ts` and its passing Vitest suite are the only implementation work marked complete.
+- Phase 1: `src/game/logic.ts` and the passing Vitest suite are complete; mission-manager coverage now brings the suite to 10 tests.
 - Phase 2: Browser integration source and production build are complete; an independently observed browser smoke run remains pending after the built-in local-page load timed out.
 - Phase 3: Reproducibility must use Node 22.14.0, the existing lockfile/scripts, and the existing Docker/nginx path.
 
 ### Pending Todos
 
-None yet.
+Resume the paused built-in browser tab and observe the preview URL `http://127.0.0.1:4174/` before marking Phase 2 complete.
 
 ### Blockers/Concerns
 
-- Phase 2: Built-in browser smoke verification timed out while loading the local Vite page; repeat with a supported browser runner before marking the phase complete.
+- Phase 2: Built-in browser smoke verification is blocked by the paused browser tab; repeat with the user-resumed tab before marking the phase complete.
 - Phase 3: The Docker build and static nginx serving path have not yet been independently verified in this session.
 
 ## Deferred Items

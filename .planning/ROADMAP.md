@@ -34,10 +34,10 @@ Plans:
 **Depends on**: Phase 1
 **Requirements**: BROWSER-01
 **Success Criteria** (what must be TRUE):
-   1. Vite resolves `src/main.ts`, the entrypoint mounts `Game` into `#app`, and `npm run typecheck` plus `npm run build` complete with the Three.js canvas and existing HUD/screen layers included in the output.
+   1. Vite resolves `src/main.ts`, the entrypoint mounts `Game` into `#app`, and `npm run typecheck` plus `npm run build` complete with the Three.js canvas and existing HUD/screen layers included in the output. **Verified locally.**
   2. A player can reach the title menu, start or restart a run, advance the briefing, move and attack with the existing keyboard/touch controls, and pause/resume through the current screen callbacks.
   3. The existing city, hero, enemies, boss, effects, mission progression, score/reward HUD, audio toggle, game-over, victory, and local-save behavior participate in one playable run through the mission flow.
-  4. `npm run typecheck` and `npm run build` complete successfully and produce a Vite `dist/` artifact that contains the browser entrypoint.
+   4. `npm run typecheck` and `npm run build` complete successfully and produce a Vite `dist/` artifact that contains the browser entrypoint. **Verified locally.**
 **Plans**: 1 plan
 
 Plans:
