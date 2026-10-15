@@ -2,9 +2,9 @@
 
 ## What This Is
 
-Mass Metro: Shadow of Muthu Nagar is a browser-first Three.js action game set in a neon city. The repository contains the Vite entrypoint, gameplay entities, city construction, mission definitions, effects, audio, HUD, screens, and a deterministic gameplay-logic module.
+Mass Metro: Shadow of Muthu Nagar is a browser-first Three.js action game set in a rain-slick neon city. The repository contains the Vite entrypoint, gameplay entities, city construction, weather and bloom effects, mission definitions, audio, HUD, screens, and a deterministic gameplay-logic module.
 
-The deterministic logic and its unit tests are present and verified. The browser entrypoint and Three.js orchestration are now present, and the production build and typecheck pass. Interactive browser smoke verification still needs to be recorded independently in the final release checklist.
+The deterministic logic and its unit tests are present and verified. The browser entrypoint and Three.js orchestration are integrated, and the production build and typecheck pass. Interactive browser smoke verification still needs to be recorded independently in the final release checklist.
 
 ## Core Value
 
@@ -18,6 +18,7 @@ Players can enter a responsive, replayable action game where combat resources, c
 
 - ✓ Deterministic gameplay helpers for health, meter, cooldowns, combos, mission progress, and score are implemented in `src/game/logic.ts` and covered by the current test suite.
 - ✓ `npm test` passes the existing `tests/logic.test.ts` suite: 1 test file and 8 tests passed.
+- ✓ `npm run typecheck` and `npm run build` complete successfully and produce the Vite `dist/` artifact.
 
 ### Active
 
@@ -25,6 +26,7 @@ Players can enter a responsive, replayable action game where combat resources, c
 
 - [ ] Reproduce the pinned Node/Vite toolchain from a clean checkout using the existing lockfile, scripts, and container path.
 - [ ] Complete an independently recorded browser smoke run covering the title menu, mission flow, controls, pause, and end states.
+- [ ] Verify the Docker image when a local Docker daemon is available; the Dockerfile and nginx path are already present.
 
 ### Out of Scope
 
@@ -39,7 +41,8 @@ Players can enter a responsive, replayable action game where combat resources, c
 - Ingest found zero source planning documents, decisions, requirements, constraints, and context topics. This baseline is therefore inferred directly from the current repository files.
 - The declared runtime is Node `22.14.0` via `.nvmrc`. `package.json` declares Vite `6.0.7`, TypeScript `5.7.2`, Vitest `2.1.8`, and Three.js `0.171.0`; `package-lock.json` is lockfile version 3.
 - Existing scripts are `dev`, `build`, `preview`, `test`, `test:watch`, and `typecheck`. The Dockerfile builds with Node 22 and serves `dist/` through nginx using `nginx.conf`.
-- Existing modules cover `Hero`, `Enemy`, and `Boss` entities; `City`; `InputManager`, definitions, audio, effects, types, and deterministic logic; `MissionManager`; `Hud`; `Screens`; and the `Game` orchestrator mounted by `src/main.ts`.
+- Existing modules cover `Hero`, `Enemy`, and `Boss` entities; `City`; `WeatherSystem`; post-processing; `InputManager`, definitions, audio, effects, types, and deterministic logic; `MissionManager`; `Hud`; `Screens`; and the `Game` orchestrator mounted by `src/main.ts`.
+- `demo-folder/` is attached reference material only. It is ignored, not bundled, and not edited; its GTA/re3 source and assets are not copied into the original web game.
 - Verification performed during the current documentation pass:
   - `npm test -- --run tests/logic.test.ts` passes all 8 logic tests.
   - `npm run typecheck` passes.

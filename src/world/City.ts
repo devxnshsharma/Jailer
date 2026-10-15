@@ -107,6 +107,26 @@ function addMarketStall(parent: THREE.Group, x: number, z: number, color: number
   parent.add(stall);
 }
 
+function addPuddle(parent: THREE.Group, x: number, z: number, width: number, depth: number, color: number): void {
+  const puddle = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, depth),
+    new THREE.MeshStandardMaterial({ color, metalness: 0.82, roughness: 0.12, transparent: true, opacity: 0.74 }),
+  );
+  puddle.rotation.x = -Math.PI / 2;
+  puddle.position.set(x, 0.075, z);
+  parent.add(puddle);
+}
+
+function addOverheadCable(parent: THREE.Group, x: number, z: number, length: number, color: number): void {
+  const cable = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.025, 0.025, length, 6),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.42 }),
+  );
+  cable.position.set(x, 7.2, z);
+  cable.rotation.z = Math.PI / 2;
+  parent.add(cable);
+}
+
 export interface CityBuild {
   group: THREE.Group;
   arenaMarkers: THREE.Group;
@@ -169,6 +189,11 @@ export function createCity(): CityBuild {
   addMarketStall(group, -5.7, 3.2, COLORS.amber);
   addMarketStall(group, 8.5, -3.2, COLORS.cyan);
   addMarketStall(group, 5.7, -3.2, COLORS.purple);
+  addPuddle(group, -2.4, 1.1, 4.5, 1.2, 0x152b48);
+  addPuddle(group, 4.8, 7.7, 2.3, 0.8, 0x17213d);
+  addPuddle(group, -7.2, -5.9, 3.2, 0.9, 0x252343);
+  addOverheadCable(group, 0, -8.6, 24, 0x4a5265);
+  addOverheadCable(group, 0, 8.6, 24, 0x4a5265);
 
   const hideout = new THREE.Group();
   hideout.name = 'Iron Hideout';

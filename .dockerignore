@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+.npm-cache
+.git
+.opencode
+demo-folder
+.DS_Store
