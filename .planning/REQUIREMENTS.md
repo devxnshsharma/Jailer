@@ -8,9 +8,9 @@
 The ingest set contained no source requirements, so these v1 requirements are derived from the current repository and the requested planning scope.
 
 - `npm test`: **pass** — 1 file and 8 tests passed.
-- `npm exec -- vite build`: **fails** because `index.html` references the missing `src/main.ts`.
-- `npm run typecheck`: **fails** on the unfinished `src/game/Game.ts` and missing declarations for the declared `three` package.
-- `npm run build`: **fails during `tsc --noEmit`**; browser integration remains pending.
+- `npm run typecheck`: **pass**.
+- `npm run build`: **pass** — Vite emits the production `dist/` artifact.
+- Built-in browser smoke: **inconclusive** because the local page load timed out; interactive completion remains pending independent observation.
 
 ## v1 Requirements
 
@@ -30,7 +30,7 @@ Requirements for the initial playable browser release. Each maps to exactly one 
 
 ### Browser Entry & Orchestration
 
-- [ ] **BROWSER-01**: A browser entrypoint at `src/main.ts` mounts the existing `Game` orchestrator at the `#app` element so the Three.js city, entities, input, effects, missions, HUD, screens, audio, and local save flow form a buildable and playable Vite application.
+- [ ] **BROWSER-01**: A browser entrypoint at `src/main.ts` mounts the existing `Game` orchestrator at the `#app` element so the Three.js city, entities, input, effects, missions, HUD, screens, audio, and local save flow form a buildable and playable Vite application; the source integration and production build are complete, while the interactive smoke run remains to be observed.
 
 ## v2 Requirements
 

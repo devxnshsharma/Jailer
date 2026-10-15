@@ -2,7 +2,7 @@
 
 ## Overview
 
-The roadmap starts from the verified deterministic gameplay core and its passing unit tests, then completes the missing browser entry and existing game orchestrator, and finally validates that the finished Vite application can be reproduced from a clean Node 22.14.0 checkout and served through the repository's existing container path. It intentionally stays within the current client-side Three.js game scope.
+The roadmap starts from the verified deterministic gameplay core and its passing unit tests, records the browser entry and existing game orchestrator, and finally validates that the finished Vite application can be reproduced from a clean Node 22.14.0 checkout and served through the repository's existing container path. It intentionally stays within the current client-side Three.js game scope.
 
 ## Phases
 
@@ -11,7 +11,7 @@ The roadmap starts from the verified deterministic gameplay core and its passing
 - Decimal phases are reserved for urgent insertions after planning
 
 - [x] **Phase 1: Deterministic Core & Unit Baseline** - Preserve and verify the pure gameplay rules and their current Vitest coverage.
-- [ ] **Phase 2: Browser Entry & Playable Orchestration** - Connect the existing Three.js systems through `src/main.ts` and make the browser game build and play end to end.
+- [ ] **Phase 2: Browser Entry & Playable Orchestration** - Record an independent browser smoke run for the now-connected Three.js systems and verify the playable flow end to end.
 - [ ] **Phase 3: Reproducible Release Path** - Validate the pinned Node/npm workflow, project-local dependencies, existing scripts, and Docker/nginx serving path from a clean checkout.
 
 ## Phase Details
@@ -30,18 +30,18 @@ Plans:
 - [x] 01-01: Verify deterministic gameplay helpers with the current unit suite.
 
 ### Phase 2: Browser Entry & Playable Orchestration
-**Goal**: Players can launch the existing Three.js game from the HTML mount and use its current gameplay, UI, audio, and effects systems as one playable browser flow.
+**Goal**: Players can launch the existing Three.js game from the HTML mount and use its current gameplay, UI, audio, and effects systems as one observed playable browser flow.
 **Depends on**: Phase 1
 **Requirements**: BROWSER-01
 **Success Criteria** (what must be TRUE):
-  1. Vite resolves `src/main.ts`, the entrypoint mounts `Game` into `#app`, and the page renders the Three.js canvas plus the existing HUD/screen layers without unresolved imports or type-check errors.
+   1. Vite resolves `src/main.ts`, the entrypoint mounts `Game` into `#app`, and `npm run typecheck` plus `npm run build` complete with the Three.js canvas and existing HUD/screen layers included in the output.
   2. A player can reach the title menu, start or restart a run, advance the briefing, move and attack with the existing keyboard/touch controls, and pause/resume through the current screen callbacks.
   3. The existing city, hero, enemies, boss, effects, mission progression, score/reward HUD, audio toggle, game-over, victory, and local-save behavior participate in one playable run through the mission flow.
   4. `npm run typecheck` and `npm run build` complete successfully and produce a Vite `dist/` artifact that contains the browser entrypoint.
 **Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: Complete the browser entry and repair the existing game orchestration/type surface so the Vite application builds and runs.
+- [ ] 02-01: Observe and record the complete browser flow, including menu start, mission controls, pause, and end-state transitions.
 **UI hint**: yes
 
 ### Phase 3: Reproducible Release Path

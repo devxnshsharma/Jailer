@@ -56,7 +56,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - Phase 1: `src/game/logic.ts` and its passing Vitest suite are the only implementation work marked complete.
-- Phase 2: Browser integration remains pending because `src/main.ts` is missing and `Game.ts` does not currently type-check.
+- Phase 2: Browser integration source and production build are complete; an independently observed browser smoke run remains pending after the built-in local-page load timed out.
 - Phase 3: Reproducibility must use Node 22.14.0, the existing lockfile/scripts, and the existing Docker/nginx path.
 
 ### Pending Todos
@@ -65,9 +65,8 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 2: `index.html` references a missing `src/main.ts`; direct Vite build verification fails at that entrypoint.
-- Phase 2: `src/game/Game.ts` is unfinished (`'}' expected`), and the full typecheck also reports missing declarations for the declared `three` package.
-- Phase 3: The Docker build cannot be treated as verified until the browser build is complete.
+- Phase 2: Built-in browser smoke verification timed out while loading the local Vite page; repeat with a supported browser runner before marking the phase complete.
+- Phase 3: The Docker build and static nginx serving path have not yet been independently verified in this session.
 
 ## Deferred Items
 

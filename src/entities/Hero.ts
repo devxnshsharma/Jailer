@@ -25,10 +25,23 @@ const HERO_COLORS = {
 };
 
 function box(width: number, height: number, depth: number, color: number, emissive = 0, intensity = 0): THREE.Mesh {
-  return new THREE.Mesh(
+  const mesh = new THREE.Mesh(
     new THREE.BoxGeometry(width, height, depth),
     new THREE.MeshStandardMaterial({ color, roughness: 0.62, metalness: 0.12, emissive, emissiveIntensity: intensity }),
   );
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function capsule(radius: number, length: number, color: number, emissive = 0, intensity = 0): THREE.Mesh {
+  const mesh = new THREE.Mesh(
+    new THREE.CapsuleGeometry(radius, length, 8, 14),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.58, metalness: 0.1, emissive, emissiveIntensity: intensity }),
+  );
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
 }
 
 export class Hero {
@@ -114,6 +127,9 @@ export class Hero {
     }
 
     this.attackTimer = Math.max(0, this.attackTimer - delta);
+    if (this.attackTimer <= 0) {
+      this.attackKind = null;
+    }
     this.comboTimer = Math.max(0, this.comboTimer - delta);
     this.invulnerable = Math.max(0, this.invulnerable - delta);
     this.hitFlashTimer = Math.max(0, this.hitFlashTimer - delta);
@@ -234,22 +250,26 @@ export class Hero {
   }
 
   private buildModel(): void {
-    const trousers = box(0.62, 1.18, 0.48, HERO_COLORS.trousers);
+    const trousers = capsule(0.38, 0.6, HERO_COLORS.trousers);
+    trousers.scale.z = 0.78;
     trousers.position.set(0, 0.85, 0);
     this.visual.add(trousers);
 
-    const leftLeg = box(0.25, 0.92, 0.3, HERO_COLORS.trousers);
+    const leftLeg = capsule(0.16, 0.64, HERO_COLORS.trousers);
     leftLeg.position.set(-0.2, 0.38, 0);
-    const rightLeg = box(0.25, 0.92, 0.3, HERO_COLORS.trousers);
+    const rightLeg = capsule(0.16, 0.64, HERO_COLORS.trousers);
     rightLeg.position.set(0.2, 0.38, 0);
-    const leftShoe = box(0.34, 0.16, 0.58, HERO_COLORS.shoe, 0x111421, 0.1);
+    const leftShoe = capsule(0.17, 0.28, HERO_COLORS.shoe, 0x111421, 0.1);
+    leftShoe.scale.z = 1.5;
     leftShoe.position.set(-0.2, -0.08, -0.08);
-    const rightShoe = box(0.34, 0.16, 0.58, HERO_COLORS.shoe, 0x111421, 0.1);
+    const rightShoe = capsule(0.17, 0.28, HERO_COLORS.shoe, 0x111421, 0.1);
+    rightShoe.scale.z = 1.5;
     rightShoe.position.set(0.2, -0.08, -0.08);
     this.visual.add(leftLeg, rightLeg, leftShoe, rightShoe);
     this.legs.push(leftLeg, rightLeg);
 
-    const torso = box(0.95, 1.2, 0.56, HERO_COLORS.shirt);
+    const torso = capsule(0.46, 0.58, HERO_COLORS.shirt);
+    torso.scale.z = 0.72;
     torso.position.y = 1.72;
     this.visual.add(torso);
     const belt = box(1.02, 0.12, 0.6, HERO_COLORS.belt);
@@ -282,9 +302,9 @@ export class Hero {
     bridge.position.set(0, 2.78, -0.37);
     this.visual.add(bridge);
 
-    const leftArm = box(0.25, 0.98, 0.3, HERO_COLORS.shirt);
+    const leftArm = capsule(0.15, 0.68, HERO_COLORS.shirt);
     leftArm.position.set(-0.64, 1.78, 0);
-    const rightArm = box(0.25, 0.98, 0.3, HERO_COLORS.shirt);
+    const rightArm = capsule(0.15, 0.68, HERO_COLORS.shirt);
     rightArm.position.set(0.64, 1.78, 0);
     const leftHand = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshStandardMaterial({ color: HERO_COLORS.skin }));
     leftHand.position.set(-0.64, 1.2, 0);
@@ -292,5 +312,21 @@ export class Hero {
     rightHand.position.set(0.64, 1.2, 0);
     this.visual.add(leftArm, rightArm, leftHand, rightHand);
     this.arms.push(leftArm, rightArm);
+
+    const collarLeft = box(0.15, 0.5, 0.05, 0x45485a);
+    collarLeft.position.set(-0.18, 2.18, -0.31);
+    collarLeft.rotation.z = -0.35;
+    const collarRight = box(0.15, 0.5, 0.05, 0x45485a);
+    collarRight.position.set(0.18, 2.18, -0.31);
+    collarRight.rotation.z = 0.35;
+    this.visual.add(collarLeft, collarRight);
+
+    const chain = new THREE.Mesh(
+      new THREE.TorusGeometry(0.15, 0.018, 6, 18, Math.PI),
+      new THREE.MeshStandardMaterial({ color: HERO_COLORS.belt, metalness: 0.72, roughness: 0.25 }),
+    );
+    chain.position.set(0, 2.14, -0.34);
+    chain.rotation.x = Math.PI / 2;
+    this.visual.add(chain);
   }
 }

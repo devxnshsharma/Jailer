@@ -2,9 +2,9 @@
 
 ## What This Is
 
-Mass Metro: Shadow of Muthu Nagar is a browser-first Three.js action game set in a neon city. The current repository contains the gameplay entities, city construction, mission definitions, effects, audio, HUD, screens, and a deterministic gameplay-logic module intended to be driven by a Vite entrypoint.
+Mass Metro: Shadow of Muthu Nagar is a browser-first Three.js action game set in a neon city. The repository contains the Vite entrypoint, gameplay entities, city construction, mission definitions, effects, audio, HUD, screens, and a deterministic gameplay-logic module.
 
-The deterministic logic and its unit tests are present and verified. The browser application is not yet complete: `index.html` points at a missing `src/main.ts`, the current `Game.ts` file is syntactically incomplete, and the production build cannot succeed until those integration blockers and the existing Three.js type-check issue are resolved.
+The deterministic logic and its unit tests are present and verified. The browser entrypoint and Three.js orchestration are now present, and the production build and typecheck pass. Interactive browser smoke verification still needs to be recorded independently in the final release checklist.
 
 ## Core Value
 
@@ -24,7 +24,7 @@ Players can enter a responsive, replayable action game where combat resources, c
 <!-- Current scope derived from the repository and this planning request. -->
 
 - [ ] Reproduce the pinned Node/Vite toolchain from a clean checkout using the existing lockfile, scripts, and container path.
-- [ ] Add the browser entrypoint and complete the existing Three.js game orchestration so the app loads and plays through Vite.
+- [ ] Complete an independently recorded browser smoke run covering the title menu, mission flow, controls, pause, and end states.
 
 ### Out of Scope
 
@@ -39,12 +39,12 @@ Players can enter a responsive, replayable action game where combat resources, c
 - Ingest found zero source planning documents, decisions, requirements, constraints, and context topics. This baseline is therefore inferred directly from the current repository files.
 - The declared runtime is Node `22.14.0` via `.nvmrc`. `package.json` declares Vite `6.0.7`, TypeScript `5.7.2`, Vitest `2.1.8`, and Three.js `0.171.0`; `package-lock.json` is lockfile version 3.
 - Existing scripts are `dev`, `build`, `preview`, `test`, `test:watch`, and `typecheck`. The Dockerfile builds with Node 22 and serves `dist/` through nginx using `nginx.conf`.
-- Existing modules cover `Hero`, `Enemy`, and `Boss` entities; `City`; `InputManager`, definitions, audio, effects, types, and deterministic logic; `MissionManager`; `Hud`; `Screens`; and a partially written `Game` orchestrator.
-- Verification performed during baseline inspection:
-  - `npm test` passes all 8 logic tests.
-  - `npm exec -- vite build` fails because `/src/main.ts` cannot be resolved from `index.html`.
-  - `npm run typecheck` reports the unfinished `src/game/Game.ts` (`'}' expected`) and missing declarations for the declared `three` package.
-  - `npm run build` consequently fails during its `tsc --noEmit` step; the direct Vite check independently confirms the missing browser entrypoint.
+- Existing modules cover `Hero`, `Enemy`, and `Boss` entities; `City`; `InputManager`, definitions, audio, effects, types, and deterministic logic; `MissionManager`; `Hud`; `Screens`; and the `Game` orchestrator mounted by `src/main.ts`.
+- Verification performed during the current documentation pass:
+  - `npm test -- --run tests/logic.test.ts` passes all 8 logic tests.
+  - `npm run typecheck` passes.
+  - `npm run build` passes and emits `dist/` through Vite.
+  - A built-in browser smoke attempt was inconclusive because the local page load timed out; no browser interaction is marked complete until it is independently observed.
 
 ## Constraints
 
@@ -63,8 +63,8 @@ Players can enter a responsive, replayable action game where combat resources, c
 |----------|-----------|---------|
 | Preserve the existing Node/Vite/TypeScript/Three.js/Vitest stack and lockfile | It is already declared in the repository and is the requested target runtime | — Pending |
 | Treat `src/game/logic.ts` and its passing unit tests as the verified baseline | The pure logic is isolated and `npm test` passes all current cases | ✓ Good |
-| Treat browser integration as pending until the entrypoint and orchestrator build cleanly | `src/main.ts` is missing, `Game.ts` is incomplete, and the build currently fails | — Pending |
+| Treat browser integration as pending until a browser smoke run is independently observed | The entrypoint, orchestrator, typecheck, and production build now pass, but the built-in browser load timed out during this documentation pass | — Pending |
 | Keep the roadmap client-side and avoid backend/auth/deployment features | No source planning documents or repository modules justify those features | ✓ Good |
 
 ---
-*Last updated: 2026-10-15 after empty-ingest baseline inspection and initial roadmap creation*
+*Last updated: 2026-10-15 after empty-ingest baseline inspection, browser integration, and documentation verification*

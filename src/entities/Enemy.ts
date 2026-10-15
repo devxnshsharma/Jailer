@@ -26,10 +26,13 @@ const STATS: Record<EnemyKind, EnemyStats> = {
 };
 
 function createPart(geometry: THREE.BufferGeometry, color: number, emissive = 0, intensity = 0): THREE.Mesh {
-  return new THREE.Mesh(
+  const mesh = new THREE.Mesh(
     geometry,
     new THREE.MeshStandardMaterial({ color, roughness: 0.68, metalness: 0.16, emissive, emissiveIntensity: intensity }),
   );
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
 }
 
 export class Enemy {

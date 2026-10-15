@@ -28,12 +28,23 @@ export class Screens {
     this.root.append(this.panel);
   }
 
+  showLoading(): void {
+    this.render(`
+      <div class="loading-mark"><span></span><span></span><span></span></div>
+      <div class="title-kicker">MUTHU NAGAR / NIGHT SIGNAL</div>
+      <h2>LOADING<br><em>THE STREET.</em></h2>
+      <p class="briefing-line">Warming the neon. Tuning the rain. Finding the way in.</p>
+    `);
+    this.setVisible(true);
+  }
+
   showMenu(highScore: number, soundEnabled: boolean): void {
     this.render(`
       <div class="title-kicker"><span class="kicker-dot"></span> AN ORIGINAL CINEMATIC ACTION GAME</div>
       <h1>MASS<br><em>METRO</em></h1>
       <p class="title-subtitle">SHADOW OF MUTHU NAGAR</p>
       <p class="title-copy">One street. One promise. One impossible entry.</p>
+      <div class="hero-card"><span>VETRI VARMAN</span><strong>THE QUIET STORM</strong><small>Former city fixer. Reluctant protector. Nila's last signal is somewhere beyond the neon.</small></div>
       <div class="menu-actions"></div>
       <div class="menu-meta"><span>HIGH SCORE <strong>${String(highScore).padStart(6, '0')}</strong></span><span>BUILD 01 · WEB</span></div>
       <div class="control-strip"><span>WASD MOVE</span><span>J STRIKE</span><span>Q DODGE</span><span>1–4 AURA MOVES</span></div>
@@ -51,11 +62,19 @@ export class Screens {
     const title = isBoss ? 'THE LAST BELL' : mission?.title ?? 'NEXT STREET';
     const subtitle = isBoss ? 'Rathna Veyil is waiting inside the dead factory.' : mission?.subtitle ?? '';
     const objective = isBoss ? 'Break the syndicate. Bring Nila home.' : mission?.objective ?? '';
+    const lore = isBoss
+      ? 'Rathna built the Black Lotus Combine on fear. Vetri is going to dismantle it one bell at a time.'
+      : index === 0
+        ? 'Nila\'s emergency frequency cuts through the bazaar. The first squad is already waiting.'
+        : index === 1
+          ? 'The courier has the route to Nila. Follow the rooftops before the signal goes dark.'
+          : 'The hideout is an old freight terminal. Every locked door is another piece of the city to reclaim.';
     this.render(`
       <div class="briefing-stamp">MISSION ${String(index + 1).padStart(2, '0')} / ${isBoss ? 'FINAL' : '4'}</div>
       <h2>${title}</h2>
       <p class="briefing-subtitle">${subtitle}</p>
       <div class="briefing-objective"><span>OBJECTIVE</span><strong>${objective}</strong></div>
+      <p class="story-note">${lore}</p>
       <p class="briefing-line">No backup. No shortcuts. Just presence.</p>
       <div class="menu-actions"></div>
     `);

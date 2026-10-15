@@ -111,7 +111,10 @@ export class Game {
 
     window.addEventListener('resize', this.resize);
     this.resize();
-    this.screens.showMenu(this.saveData.highScore, this.saveData.soundEnabled);
+    this.screens.showLoading();
+    window.setTimeout(() => {
+      if (this.phase === 'menu') this.screens.showMenu(this.saveData.highScore, this.saveData.soundEnabled);
+    }, 420);
     requestAnimationFrame(this.loop);
   }
 
