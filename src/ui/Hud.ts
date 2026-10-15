@@ -96,6 +96,11 @@ export class Hud {
       });
       button.addEventListener('pointerup', () => this.input.setVirtualAction(`weapon${index + 1}` as InputAction, false));
       button.addEventListener('pointercancel', () => this.input.setVirtualAction(`weapon${index + 1}` as InputAction, false));
+      button.addEventListener('click', () => {
+        const action = `weapon${index + 1}` as InputAction;
+        this.input.setVirtualAction(action, true);
+        window.setTimeout(() => this.input.setVirtualAction(action, false), 120);
+      });
       weaponSwitches.append(button);
     });
     this.buildAbilities();
