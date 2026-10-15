@@ -216,9 +216,19 @@ export class Hero {
   setWeaponVisual(id: WeaponId): void {
     this.activeWeapon = id;
     this.weaponVisual.clear();
+    this.weaponVisual.visible = id !== 'unarmed';
     const metal = new THREE.MeshStandardMaterial({ color: 0x171b27, metalness: 0.82, roughness: 0.24 });
     const grip = new THREE.MeshStandardMaterial({ color: 0x4a302b, roughness: 0.66, metalness: 0.08 });
-    const accent = new THREE.MeshStandardMaterial({ color: id === 'pistol' ? 0xffc857 : id === 'scattergun' ? 0xff765e : 0x65ddff, emissive: id === 'pistol' ? 0xffc857 : id === 'scattergun' ? 0xff765e : 0x65ddff, emissiveIntensity: 1.5, metalness: 0.5, roughness: 0.24 });
+    const wood = new THREE.MeshStandardMaterial({ color: 0x8e5739, roughness: 0.8, metalness: 0.05 });
+    const accentColor = id === 'pistol' ? 0xffc857
+      : id === 'scattergun' ? 0xff765e
+        : id === 'flamethrower' ? 0xff5a38
+          : id === 'molotov' ? 0xffb83d
+            : id === 'grenade' ? 0x8fe36f
+              : id === 'detonator' ? 0xb58cff
+                : id === 'heliCannon' ? 0x5ce1cf
+                  : 0x65ddff;
+    const accent = new THREE.MeshStandardMaterial({ color: accentColor, emissive: accentColor, emissiveIntensity: 1.5, metalness: 0.5, roughness: 0.24 });
     const add = (geometry: THREE.BufferGeometry, material: THREE.Material, position: THREE.Vector3, rotation = new THREE.Euler()): void => {
       const part = new THREE.Mesh(geometry, material);
       part.position.copy(position);
@@ -227,20 +237,101 @@ export class Hero {
       this.weaponVisual.add(part);
     };
 
+    if (id === 'unarmed') return;
+
+    if (id === 'baseballBat') {
+      add(new THREE.CylinderGeometry(0.08, 0.13, 1.35, 10), wood, new THREE.Vector3(0, -0.04, -0.62), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.CylinderGeometry(0.095, 0.095, 0.28, 10), grip, new THREE.Vector3(0, -0.04, 0.2), new THREE.Euler(Math.PI / 2, 0, 0));
+      return;
+    }
+
     if (id === 'pistol') {
       add(new THREE.BoxGeometry(0.18, 0.2, 0.62), metal, new THREE.Vector3(0, 0, -0.22));
       add(new THREE.BoxGeometry(0.15, 0.4, 0.18), grip, new THREE.Vector3(0, -0.25, -0.02), new THREE.Euler(0.16, 0, 0));
       add(new THREE.BoxGeometry(0.11, 0.07, 0.18), accent, new THREE.Vector3(0, 0.09, -0.53));
-    } else if (id === 'scattergun') {
+      return;
+    }
+
+    if (id === 'scattergun') {
       add(new THREE.CylinderGeometry(0.085, 0.085, 1.15, 10), metal, new THREE.Vector3(0, 0.05, -0.56), new THREE.Euler(Math.PI / 2, 0, 0));
       add(new THREE.BoxGeometry(0.28, 0.23, 0.45), metal, new THREE.Vector3(0, 0, -0.12));
       add(new THREE.BoxGeometry(0.2, 0.38, 0.22), grip, new THREE.Vector3(0, -0.26, 0.12), new THREE.Euler(0.18, 0, 0));
       add(new THREE.BoxGeometry(0.13, 0.08, 0.13), accent, new THREE.Vector3(0, 0.14, -1.12));
-    } else {
+      return;
+    }
+
+    if (id === 'uzi') {
+      add(new THREE.BoxGeometry(0.21, 0.22, 0.56), metal, new THREE.Vector3(0, 0, -0.2));
+      add(new THREE.BoxGeometry(0.12, 0.33, 0.17), grip, new THREE.Vector3(0, -0.22, -0.02), new THREE.Euler(0.12, 0, 0));
+      add(new THREE.CylinderGeometry(0.045, 0.045, 0.76, 8), metal, new THREE.Vector3(0, 0.02, -0.73), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.1, 0.07, 0.12), accent, new THREE.Vector3(0, 0.05, -1.12));
+      return;
+    }
+
+    if (id === 'ak47') {
+      add(new THREE.BoxGeometry(0.22, 0.24, 0.62), metal, new THREE.Vector3(0, 0, -0.2));
+      add(new THREE.BoxGeometry(0.2, 0.2, 0.45), wood, new THREE.Vector3(0, -0.02, 0.27));
+      add(new THREE.CylinderGeometry(0.055, 0.055, 1.25, 8), metal, new THREE.Vector3(0, 0.02, -0.9), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.13, 0.4, 0.18), grip, new THREE.Vector3(0, -0.26, -0.02), new THREE.Euler(0.12, 0, 0));
+      add(new THREE.BoxGeometry(0.1, 0.08, 0.12), accent, new THREE.Vector3(0, 0.07, -1.53));
+      return;
+    }
+
+    if (id === 'carbine') {
       add(new THREE.BoxGeometry(0.25, 0.25, 0.7), metal, new THREE.Vector3(0, 0, -0.27));
       add(new THREE.CylinderGeometry(0.055, 0.055, 1.2, 8), metal, new THREE.Vector3(0, 0.01, -0.88), new THREE.Euler(Math.PI / 2, 0, 0));
       add(new THREE.BoxGeometry(0.17, 0.34, 0.22), grip, new THREE.Vector3(0, -0.23, 0.01), new THREE.Euler(0.15, 0, 0));
       add(new THREE.BoxGeometry(0.11, 0.08, 0.1), accent, new THREE.Vector3(0, 0.08, -1.5));
+      return;
+    }
+
+    if (id === 'sniperRifle') {
+      add(new THREE.BoxGeometry(0.22, 0.2, 0.82), metal, new THREE.Vector3(0, 0, 0.02));
+      add(new THREE.BoxGeometry(0.24, 0.18, 0.5), wood, new THREE.Vector3(0, -0.02, 0.58));
+      add(new THREE.CylinderGeometry(0.042, 0.042, 1.75, 8), metal, new THREE.Vector3(0, 0.01, -1.14), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.CylinderGeometry(0.045, 0.045, 0.4, 8), accent, new THREE.Vector3(0, 0.2, -0.43), new THREE.Euler(Math.PI / 2, 0, 0));
+      return;
+    }
+
+    if (id === 'rocketLauncher') {
+      add(new THREE.CylinderGeometry(0.16, 0.16, 1.7, 12), metal, new THREE.Vector3(0, 0, -0.62), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.CylinderGeometry(0.2, 0.2, 0.13, 12), accent, new THREE.Vector3(0, 0, -1.48), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.28, 0.28, 0.42), grip, new THREE.Vector3(0, -0.2, 0.05));
+      return;
+    }
+
+    if (id === 'flamethrower') {
+      add(new THREE.CylinderGeometry(0.2, 0.2, 0.48, 12), accent, new THREE.Vector3(0, 0.05, 0.28), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.3, 0.3, 0.54), metal, new THREE.Vector3(0, 0, -0.2));
+      add(new THREE.CylinderGeometry(0.09, 0.09, 1.02, 10), metal, new THREE.Vector3(0, 0, -0.83), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.ConeGeometry(0.14, 0.32, 8), accent, new THREE.Vector3(0, 0, -1.48), new THREE.Euler(-Math.PI / 2, 0, 0));
+      return;
+    }
+
+    if (id === 'molotov') {
+      add(new THREE.CylinderGeometry(0.13, 0.17, 0.42, 10), new THREE.MeshStandardMaterial({ color: 0x5e3326, roughness: 0.66 }), new THREE.Vector3(0, 0, -0.22));
+      add(new THREE.CylinderGeometry(0.08, 0.08, 0.17, 8), grip, new THREE.Vector3(0, 0.27, -0.22));
+      add(new THREE.SphereGeometry(0.08, 8, 6), accent, new THREE.Vector3(0, 0.39, -0.22));
+      return;
+    }
+
+    if (id === 'grenade') {
+      add(new THREE.DodecahedronGeometry(0.22, 0), accent, new THREE.Vector3(0, -0.03, -0.24));
+      add(new THREE.CylinderGeometry(0.055, 0.055, 0.16, 8), metal, new THREE.Vector3(0, 0.22, -0.24));
+      return;
+    }
+
+    if (id === 'detonator') {
+      add(new THREE.BoxGeometry(0.26, 0.34, 0.2), metal, new THREE.Vector3(0, -0.02, -0.2));
+      add(new THREE.BoxGeometry(0.13, 0.1, 0.05), accent, new THREE.Vector3(0, 0.2, -0.31));
+      add(new THREE.CylinderGeometry(0.018, 0.018, 0.42, 6), accent, new THREE.Vector3(0, 0.4, -0.2), new THREE.Euler(0.1, 0, 0.12));
+      return;
+    }
+
+    if (id === 'heliCannon') {
+      add(new THREE.BoxGeometry(0.32, 0.34, 0.6), metal, new THREE.Vector3(0, 0, 0));
+      add(new THREE.CylinderGeometry(0.1, 0.1, 1.3, 10), metal, new THREE.Vector3(0, 0, -0.86), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.18, 0.2, 0.3), accent, new THREE.Vector3(0, 0.02, -1.55));
     }
   }
 
