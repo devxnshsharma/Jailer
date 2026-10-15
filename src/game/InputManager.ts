@@ -10,7 +10,13 @@ export type InputAction =
   | 'ability1'
   | 'ability2'
   | 'ability3'
-  | 'ability4';
+  | 'ability4'
+  | 'shoot'
+  | 'reload'
+  | 'weapon1'
+  | 'weapon2'
+  | 'weapon3'
+  | 'aim';
 
 const KEY_BINDINGS: Record<string, InputAction> = {
   j: 'lightAttack',
@@ -26,6 +32,17 @@ const KEY_BINDINGS: Record<string, InputAction> = {
   '2': 'ability2',
   '3': 'ability3',
   '4': 'ability4',
+  l: 'shoot',
+  L: 'shoot',
+  r: 'reload',
+  R: 'reload',
+  z: 'weapon1',
+  Z: 'weapon1',
+  x: 'weapon2',
+  X: 'weapon2',
+  c: 'weapon3',
+  C: 'weapon3',
+  Control: 'aim',
 };
 
 export class InputManager {
@@ -48,10 +65,33 @@ export class InputManager {
   private readonly onKeyUp = (event: KeyboardEvent) => {
     this.keys.delete(event.key);
   };
+  private readonly onPointerDown = (event: PointerEvent) => {
+    if (!(event.target instanceof HTMLCanvasElement)) {
+      return;
+    }
+    if (event.button === 0) {
+      this.setVirtualAction('shoot', true);
+    }
+    if (event.button === 2) {
+      this.setVirtualAction('aim', true);
+    }
+  };
+  private readonly onPointerUp = (event: PointerEvent) => {
+    if (event.button === 0) {
+      this.setVirtualAction('shoot', false);
+    }
+    if (event.button === 2) {
+      this.setVirtualAction('aim', false);
+    }
+  };
+  private readonly onContextMenu = (event: MouseEvent) => event.preventDefault();
 
   constructor() {
     window.addEventListener('keydown', this.onKeyDown, { passive: false });
     window.addEventListener('keyup', this.onKeyUp);
+    window.addEventListener('pointerdown', this.onPointerDown);
+    window.addEventListener('pointerup', this.onPointerUp);
+    window.addEventListener('contextmenu', this.onContextMenu);
     window.addEventListener('blur', () => this.clear());
   }
 
@@ -75,6 +115,10 @@ export class InputManager {
 
     if (action === 'sprint') {
       return this.keys.has('Shift');
+    }
+
+    if (action === 'shoot' || action === 'aim') {
+      return this.keys.has('l') || this.keys.has('L') || this.keys.has('Control') || this.virtualActions.has(action);
     }
 
     return false;
@@ -116,6 +160,9 @@ export class InputManager {
   dispose(): void {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('pointerdown', this.onPointerDown);
+    window.removeEventListener('pointerup', this.onPointerUp);
+    window.removeEventListener('contextmenu', this.onContextMenu);
     this.clear();
   }
 }
