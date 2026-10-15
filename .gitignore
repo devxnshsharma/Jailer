@@ -6,6 +6,7 @@ coverage/
 .vite/
 .opencode/
 .npm-cache/
+demo-folder/
 demo-folder/.clang-format
 demo-folder/.gitattributes
 demo-folder/.github/ISSUE_TEMPLATE/bug_report.md
