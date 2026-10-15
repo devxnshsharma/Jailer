@@ -9,10 +9,10 @@ import { Hero } from '../entities/Hero';
 import { AudioManager } from './AudioManager';
 import { ABILITIES, MISSIONS } from './definitions';
 import { EffectsSystem } from './EffectsSystem';
-import { InputManager } from './InputManager';
+import { InputManager, type InputAction } from './InputManager';
 import { calculateScore } from './logic';
 import type { AbilityId, GamePhase, SaveData } from './types';
-import { WeaponSystem, type ShotPlan } from './WeaponSystem';
+import { WEAPONS, WeaponSystem, type ShotPlan } from './WeaponSystem';
 import { createCity } from '../world/City';
 import { WeatherSystem } from '../world/WeatherSystem';
 import { MissionManager } from '../missions/MissionManager';
@@ -32,6 +32,8 @@ interface Projectile {
   damage: number;
   color: number;
   life: number;
+  owner: 'enemy' | 'player';
+  explosionRadius: number;
 }
 
 const SAVE_KEY = 'mass-metro-save-v1';
@@ -433,6 +435,29 @@ export class Game {
       projectile.mesh.position.addScaledVector(projectile.velocity, delta);
       projectile.mesh.rotation.x += delta * 8;
       projectile.mesh.rotation.y += delta * 9;
+      if (projectile.owner === 'player') {
+        let hitTarget = false;
+        for (const enemy of this.enemies) {
+          if (enemy.alive && projectile.mesh.position.distanceTo(enemy.group.position.clone().add(new THREE.Vector3(0, 1, 0))) < 0.85) {
+            this.detonateAt(projectile.mesh.position, projectile.damage, projectile.color, projectile.explosionRadius);
+            hitTarget = true;
+            break;
+          }
+        }
+        if (!hitTarget && this.boss?.alive && projectile.mesh.position.distanceTo(this.boss.group.position.clone().add(new THREE.Vector3(0, 1.2, 0))) < 1.15) {
+          this.detonateAt(projectile.mesh.position, projectile.damage, projectile.color, projectile.explosionRadius);
+          hitTarget = true;
+        }
+        if (hitTarget || projectile.life <= 0 || projectile.mesh.position.distanceTo(this.hero.group.position) > 80) {
+          if (!hitTarget && projectile.explosionRadius > 0) {
+            this.detonateAt(projectile.mesh.position, projectile.damage, projectile.color, projectile.explosionRadius);
+          }
+          this.removeProjectile(index);
+          continue;
+        }
+        continue;
+      }
+
       if (projectile.life <= 0 || projectile.mesh.position.distanceTo(this.hero.group.position) > 38) {
         this.removeProjectile(index);
         continue;
@@ -504,14 +529,19 @@ export class Game {
   }
 
   private handleWeapons(): void {
-    const weaponActions: Array<'weapon1' | 'weapon2' | 'weapon3'> = ['weapon1', 'weapon2', 'weapon3'];
-    weaponActions.forEach((action, index) => {
+    WEAPONS.forEach((weapon, index) => {
+      const action = `weapon${index + 1}` as InputAction;
       if (this.input.consume(action) && this.weapons.switchTo(index)) {
-        this.hero.setWeaponVisual(this.weapons.current.id);
-        this.hud.flash(`${this.weapons.current.label} EQUIPPED`, 'cyan');
-        this.audio.play('menu');
+        this.equipWeapon(weapon.id);
       }
     });
+
+    if (this.input.consume('weaponNext') && this.weapons.switchNext()) {
+      this.equipWeapon(this.weapons.current.id);
+    }
+    if (this.input.consume('weaponPrevious') && this.weapons.switchPrevious()) {
+      this.equipWeapon(this.weapons.current.id);
+    }
 
     if (this.input.consume('reload') && this.weapons.startReload()) {
       this.hud.flash(`RELOADING ${this.weapons.current.shortLabel}`, 'gold');
@@ -526,30 +556,61 @@ export class Game {
     }
   }
 
+  private equipWeapon(id: typeof WEAPONS[number]['id']): void {
+    this.hero.setWeaponVisual(id);
+    this.hud.flash(`${this.weapons.current.label} EQUIPPED`, 'cyan');
+    this.audio.play('menu');
+  }
+
   private handlePlayerShot(shot: ShotPlan): void {
     const muzzle = this.hero.getMuzzlePosition();
     const forward = this.hero.getForward().clone().normalize();
-    const minimumFacing = shot.weapon.id === 'scattergun' ? -0.08 : 0.35;
+    const minimumFacing = shot.mode === 'melee' ? 0.08 : shot.weapon.id === 'scattergun' ? -0.08 : 0.35;
     const target = this.findNearestTarget(shot.range, minimumFacing);
     const endpoint = target
       ? target.group.position.clone().add(new THREE.Vector3(0, 1.05, 0))
       : muzzle.clone().addScaledVector(forward, shot.range);
+
+    if (shot.mode === 'melee') {
+      this.effects.slash(this.hero.getAttackPosition(), shot.color);
+      this.cameraShake = Math.max(this.cameraShake, shot.weapon.id === 'baseballBat' ? 0.28 : 0.12);
+      this.audio.play(shot.weapon.id === 'baseballBat' ? 'heavy' : 'hit');
+      if (target) {
+        this.applyDirectShotDamage(target, shot.damage * shot.pellets, shot.color, shot.weapon.id === 'baseballBat' ? 11 : 5);
+      }
+      return;
+    }
+
     this.effects.muzzle(muzzle, shot.color);
-    this.effects.tracer(muzzle, endpoint, shot.color);
-    this.cameraShake = Math.max(this.cameraShake, shot.weapon.id === 'scattergun' ? 0.34 : 0.12);
-    this.audio.play(shot.weapon.id === 'scattergun' ? 'heavy' : 'hit');
+    this.cameraShake = Math.max(this.cameraShake, shot.weapon.id === 'scattergun' ? 0.34 : shot.mode === 'heliCannon' ? 0.28 : 0.12);
+    this.audio.play(shot.mode === 'flame' || shot.mode === 'projectile' || shot.mode === 'heliCannon' ? 'heavy' : 'hit');
+
+    if (shot.mode === 'projectile' || shot.mode === 'heliCannon') {
+      this.effects.tracer(muzzle, endpoint, shot.color);
+      this.spawnPlayerProjectile(muzzle, forward, shot);
+      return;
+    }
+
+    if (shot.mode === 'detonator') {
+      this.detonateAt(endpoint, shot.damage * shot.pellets, shot.color, shot.explosionRadius);
+      return;
+    }
 
     if (!target) {
       return;
     }
 
-    const damage = shot.damage * shot.pellets;
+    this.effects.tracer(muzzle, endpoint, shot.color);
+    this.applyDirectShotDamage(target, shot.damage * shot.pellets, shot.color, shot.weapon.id === 'scattergun' ? 9 : shot.mode === 'flame' ? 4 : 2.6);
+  }
+
+  private applyDirectShotDamage(target: Enemy | Boss, damage: number, color: number, knockback: number): void {
     const direction = target.group.position.clone().sub(this.hero.group.position).normalize();
     if (target instanceof Enemy) {
-      target.takeDamage(damage, direction, shot.weapon.id === 'scattergun' ? 9 : 2.6);
-      this.onSuccessfulHit(target.group.position, damage, shot.color, target);
-    } else if (target.alive && target.takeDamage(damage, direction, shot.weapon.id === 'scattergun' ? 7 : 2)) {
-      this.onSuccessfulHit(target.group.position, damage, shot.color);
+      target.takeDamage(damage, direction, knockback);
+      this.onSuccessfulHit(target.group.position, damage, color, target);
+    } else if (target.alive && target.takeDamage(damage, direction, knockback)) {
+      this.onSuccessfulHit(target.group.position, damage, color);
     }
   }
 
@@ -687,8 +748,55 @@ export class Game {
     );
     mesh.position.copy(position);
     const velocity = this.hero.group.position.clone().add(new THREE.Vector3(0, 1.1, 0)).sub(position).normalize().multiplyScalar(speed);
-    this.projectiles.push({ mesh, velocity, damage, color, life: 4 });
+    this.projectiles.push({ mesh, velocity, damage, color, life: 4, owner: 'enemy', explosionRadius: 0 });
     this.scene.add(mesh);
+  }
+
+  private spawnPlayerProjectile(position: THREE.Vector3, direction: THREE.Vector3, shot: ShotPlan): void {
+    const mesh = new THREE.Mesh(
+      shot.mode === 'heliCannon'
+        ? new THREE.OctahedronGeometry(0.22, 0)
+        : new THREE.SphereGeometry(0.18, 10, 8),
+      new THREE.MeshBasicMaterial({ color: shot.color, transparent: true, opacity: 0.98 }),
+    );
+    mesh.position.copy(position);
+    const velocity = direction.clone().normalize().multiplyScalar(shot.projectileSpeed);
+    this.projectiles.push({
+      mesh,
+      velocity,
+      damage: shot.damage * shot.pellets,
+      color: shot.color,
+      life: shot.weapon.id === 'rocketLauncher' ? 4.2 : 2.8,
+      owner: 'player',
+      explosionRadius: shot.explosionRadius,
+    });
+    this.scene.add(mesh);
+  }
+
+  private detonateAt(position: THREE.Vector3, damage: number, color: number, radius: number): void {
+    this.effects.shockwave(position, color, radius);
+    this.effects.burst(position.clone().add(new THREE.Vector3(0, 0.5, 0)), color, 22, 5.2);
+    this.cameraShake = Math.max(this.cameraShake, Math.min(0.8, radius * 0.1));
+    const safeRadius = Math.max(0.8, radius);
+
+    for (const enemy of this.enemies) {
+      if (!enemy.alive) continue;
+      const distance = enemy.group.position.distanceTo(position);
+      if (distance > safeRadius) continue;
+      const falloff = 1 - Math.min(0.72, distance / safeRadius * 0.72);
+      const appliedDamage = damage * falloff;
+      const direction = enemy.group.position.clone().sub(position).setY(0);
+      if (direction.lengthSq() === 0) direction.copy(this.hero.getForward());
+      enemy.takeDamage(appliedDamage, direction.normalize(), 7 + (1 - distance / safeRadius) * 9);
+      this.onSuccessfulHit(enemy.group.position, appliedDamage, color, enemy);
+    }
+
+    if (this.boss?.alive) {
+      const distance = this.boss.group.position.distanceTo(position);
+      if (distance <= safeRadius + 0.8 && this.boss.takeDamage(damage * 0.75, this.boss.group.position.clone().sub(position).setY(0).normalize(), 6)) {
+        this.onSuccessfulHit(this.boss.group.position, damage * 0.75, color);
+      }
+    }
   }
 
   private onSuccessfulHit(position: THREE.Vector3, damage: number, color: number, enemy?: Enemy): void {
