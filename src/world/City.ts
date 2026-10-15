@@ -127,6 +127,67 @@ function addOverheadCable(parent: THREE.Group, x: number, z: number, length: num
   parent.add(cable);
 }
 
+function addVehicle(parent: THREE.Group, x: number, z: number, rotation: number, color: number, taxi = false): void {
+  const vehicle = new THREE.Group();
+  vehicle.position.set(x, 0, z);
+  vehicle.rotation.y = rotation;
+  const body = createBox(2.4, 0.48, 1.15, color);
+  body.position.y = 0.46;
+  vehicle.add(body);
+  const cabin = createBox(1.15, 0.44, 0.94, taxi ? 0x222938 : 0x202638);
+  cabin.position.set(-0.18, 0.83, 0);
+  vehicle.add(cabin);
+  const glass = createBox(0.72, 0.22, 0.96, taxi ? 0x96d9df : 0x526078, 0x29414d, 0.35);
+  glass.position.set(-0.3, 0.87, 0);
+  vehicle.add(glass);
+  const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.78, metalness: 0.16 });
+  for (const [wheelX, wheelZ] of [[-0.72, -0.63], [-0.72, 0.63], [0.78, -0.63], [0.78, 0.63]]) {
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.16, 12), wheelMaterial);
+    wheel.rotation.x = Math.PI / 2;
+    wheel.position.set(wheelX, 0.29, wheelZ);
+    vehicle.add(wheel);
+  }
+  const lampMaterial = new THREE.MeshStandardMaterial({ color: 0xffe1a3, emissive: 0xffc857, emissiveIntensity: 2.4 });
+  const rearMaterial = new THREE.MeshStandardMaterial({ color: 0xff4d6d, emissive: 0xff4d6d, emissiveIntensity: 1.6 });
+  for (const side of [-0.36, 0.36]) {
+    const headlamp = createBox(0.12, 0.12, 0.06, 0xffe1a3, 0xffc857, 3);
+    headlamp.position.set(1.2, 0.54, side);
+    vehicle.add(headlamp);
+    const rearLamp = createBox(0.12, 0.12, 0.06, 0xff4d6d, 0xff4d6d, 2);
+    rearLamp.position.set(-1.2, 0.54, side);
+    vehicle.add(rearLamp);
+  }
+  parent.add(vehicle);
+}
+
+function addContainer(parent: THREE.Group, x: number, z: number, color: number, rotation = 0): void {
+  const container = createBox(2.2, 1.6, 1.15, color);
+  container.position.set(x, 0.8, z);
+  container.rotation.y = rotation;
+  parent.add(container);
+  for (let index = -2; index <= 2; index += 1) {
+    const rib = createBox(0.06, 1.45, 0.03, 0x6b6e7a);
+    rib.position.set(x + index * 0.4, 0.8, z - 0.59);
+    rib.rotation.y = rotation;
+    parent.add(rib);
+  }
+}
+
+function addWaterTank(parent: THREE.Group, x: number, z: number, color: number): void {
+  const tank = new THREE.Group();
+  tank.position.set(x, 0, z);
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.95, 0.18, 16), new THREE.MeshStandardMaterial({ color: 0x56606e, metalness: 0.4, roughness: 0.5 }));
+  legs.position.y = 2.25;
+  tank.add(legs);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.86, 1.2, 16), new THREE.MeshStandardMaterial({ color, metalness: 0.22, roughness: 0.42 }));
+  body.position.y = 3;
+  tank.add(body);
+  const cap = createBox(0.18, 0.34, 0.18, 0x2e3443);
+  cap.position.y = 3.78;
+  tank.add(cap);
+  parent.add(tank);
+}
+
 export interface CityBuild {
   group: THREE.Group;
   arenaMarkers: THREE.Group;
@@ -219,6 +280,13 @@ export function createCity(): CityBuild {
   addPuddle(group, -7.2, -5.9, 3.2, 0.9, 0x252343);
   addOverheadCable(group, 0, -8.6, 24, 0x4a5265);
   addOverheadCable(group, 0, 8.6, 24, 0x4a5265);
+  addVehicle(group, -1.4, -1.5, Math.PI / 2, 0x5b6a8f);
+  addVehicle(group, 10.5, 2.1, -Math.PI / 2, 0xb44c53, true);
+  addVehicle(group, -10.5, -2.1, Math.PI / 2, 0x9c8156);
+  addContainer(group, -27, -10.3, 0x424d63, 0.08);
+  addContainer(group, -30, -8.8, 0x6a3f4e, 0.04);
+  addWaterTank(group, -15.8, -30.6, 0x53657d);
+  addWaterTank(group, 14.8, 29.5, 0x6c5863);
 
   const hideout = new THREE.Group();
   hideout.name = 'Iron Hideout';
