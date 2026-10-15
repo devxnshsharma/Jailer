@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { WeaponSystem } from '../src/game/WeaponSystem';
+import { WEAPONS, WeaponSystem } from '../src/game/WeaponSystem';
 
 describe('WeaponSystem', () => {
   it('cycles original weapons and returns a shot plan with magazine ammo', () => {
@@ -36,5 +36,32 @@ describe('WeaponSystem', () => {
     expect(weapons.startReload()).toBe(false);
     expect(weapons.tryFire()).not.toBeNull();
     expect(weapons.tryFire()).toBeNull();
+  });
+
+  it('exposes every inventory weapon from the native demo reference', () => {
+    expect(WEAPONS.map((weapon) => weapon.demoName)).toEqual([
+      'Colt45',
+      'Shotgun',
+      'M16',
+      'Unarmed',
+      'BaseballBat',
+      'Uzi',
+      'AK47',
+      'SniperRifle',
+      'RocketLauncher',
+      'FlameThrower',
+      'Molotov',
+      'Grenade',
+      'Detonator',
+      'HeliCannon',
+    ]);
+
+    const weapons = new WeaponSystem();
+    expect(weapons.switchTo(WEAPONS.length - 1)).toBe(true);
+    expect(weapons.getStatus()).toMatchObject({ id: 'heliCannon', ammo: 30, reserve: 120, usesAmmo: true });
+    expect(weapons.switchNext()).toBe(true);
+    expect(weapons.getStatus().id).toBe('pistol');
+    expect(weapons.switchPrevious()).toBe(true);
+    expect(weapons.getStatus().id).toBe('heliCannon');
   });
 });

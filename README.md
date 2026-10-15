@@ -13,9 +13,15 @@ Vetri's procedural model now uses the supplied visual mood as a reference for
 an original mature action-hero silhouette: silver swept hair, dark rectangular
 frames, a salt-and-pepper beard, open pale shirt, chain, tan trousers, dark
 shoes, and a cane prop. It does not embed or reproduce the reference photos.
-The armory contains three original weapons: a V9 sidearm, Kaveri-12
-scattergun, and Monsoon carbine, with ammo, reloads, shoulder aiming, muzzle
-flashes, tracers, ranged enemy attacks, and mobile weapon switching.
+The browser armory mirrors the native reference project's complete inventory
+set with original procedural silhouettes and browser-safe mechanics: unarmed,
+baseball bat, Colt .45, Uzi, shotgun, AK-47, M16, sniper rifle, rocket
+launcher, flamethrower, Molotov, grenade, detonator, and heli cannon. Firearms
+support ammo and reloads; melee, flame, projectile, explosive, and remote
+detonation modes are all playable. The world stages original Tamil street
+scenarios across a temple bazaar, rooftop bus route, harbour freight yard, and
+bell-temple finale with autos, buses, palms, kolam markings, Tamil signage,
+market stalls, cranes, and rain.
 
 ## Requirements
 
@@ -73,7 +79,7 @@ Then open the preview URL printed by Vite.
 | Fire current weapon | `L` or left mouse button |
 | Aim / shoulder camera | `Ctrl` or right mouse button |
 | Reload | `R` |
-| Switch weapon | `Z` pistol · `X` scattergun · `C` carbine |
+| Switch weapon | `Z`/`X`/`C` then `V` through `]`, or `Tab` / `Shift+Tab` to cycle |
 | Pause/resume | `Escape` |
 | Abilities | `1`–`4` |
 
@@ -147,7 +153,7 @@ src/game/logic.ts       Pure deterministic gameplay rules
 src/entities/           Hero, enemy, and boss entities
 src/missions/           Mission progression
 src/ui/                 HUD and menu/pause/victory screens
-src/world/              Neon city scene construction
+src/world/              Tamil street, scenario set pieces, and weather
 src/styles/             Global game styling
 tests/logic.test.ts     Vitest coverage for deterministic rules
 .planning/              GSD project context, requirements, roadmap, and state
@@ -157,9 +163,11 @@ tests/logic.test.ts     Vitest coverage for deterministic rules
 
 `demo-folder/` is an attached, read-only reference project. It is intentionally
 ignored by the application repository and is not imported, bundled, or edited
-by the Vite game. Its high-level ideas—separate world/model/audio systems,
-rain droplets, colour filtering, camera polish, and mission-driven flow—were
-reinterpreted as original TypeScript/Three.js systems under `src/`.
+by the Vite game. Its high-level inventory taxonomy, third-person combat
+rhythm, vehicle/world categories, rain, colour filtering, camera polish, and
+mission-driven flow are reinterpreted as original TypeScript/Three.js systems
+under `src/`. No demo photographs, game binaries, or proprietary model files
+are bundled.
 
 ## Planning documentation
 
