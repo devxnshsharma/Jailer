@@ -120,7 +120,7 @@ export class Hero {
       this.startAttack('heavy');
     }
 
-    const speed = input.isDown('sprint') ? 8.4 : 5.4;
+    const speed = input.isDown('aim') ? 3.15 : input.isDown('sprint') ? 8.4 : 5.4;
     if (this.dodgeTimer > 0) {
       this.dodgeTimer -= delta;
       this.group.position.addScaledVector(this.direction, 14 * delta);

@@ -13,6 +13,7 @@ export interface HudState {
   objective: string;
   progress: string;
   weapon: WeaponStatus;
+  aiming: boolean;
   bossHealth?: number;
   bossMaxHealth?: number;
 }
@@ -55,6 +56,7 @@ export class Hud {
         <div class="bar-block meter-block"><div class="bar-label"><span>AURA METER</span><span data-meter-label>38%</span></div><div class="bar meter-bar"><div class="bar-fill" data-meter></div></div></div>
       </div>
       <div class="ability-dock"></div>
+      <div class="aim-reticle" data-reticle><span></span><span></span><span></span><span></span><b>+</b></div>
       <div class="combo-readout" data-combo></div>
       <div class="toast" data-toast></div>
     `;
@@ -97,6 +99,8 @@ export class Hud {
     this.weaponReserve.textContent = String(state.weapon.reserve).padStart(3, '0');
     this.weaponReload.style.transform = `scaleX(${state.weapon.reloading ? state.weapon.reloadProgress : 0})`;
     this.weaponReload.dataset.active = state.weapon.reloading ? 'true' : 'false';
+    const reticle = this.root.querySelector('[data-reticle]');
+    reticle?.classList.toggle('is-visible', state.aiming);
     const weaponShort = this.root.querySelector('[data-weapon-short]');
     if (weaponShort) weaponShort.textContent = state.weapon.id === 'pistol' ? 'V9' : state.weapon.id === 'scattergun' ? 'K12' : 'MC';
     const progressElement = this.root.querySelector('[data-progress]');

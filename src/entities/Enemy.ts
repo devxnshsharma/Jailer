@@ -183,5 +183,21 @@ export class Enemy {
     const rightArm = createPart(armGeometry, 0x31374a);
     rightArm.position.set(bodyWidth / 2 + 0.12, bodyHeight / 2 + 0.4, 0);
     this.visual.add(leftArm, rightArm);
+
+    if (this.kind === 'lookout') {
+      const gun = createPart(new THREE.BoxGeometry(0.14, 0.16, 0.68), 0x171a25, 0x42e8ff, 0.4);
+      gun.position.set(0.58, bodyHeight / 2 + 0.19, -0.32);
+      this.visual.add(gun);
+      const muzzle = createPart(new THREE.BoxGeometry(0.11, 0.1, 0.12), this.stats.color, this.stats.color, 2.4);
+      muzzle.position.set(0.58, bodyHeight / 2 + 0.19, -0.73);
+      this.visual.add(muzzle);
+    }
+
+    if (this.kind === 'enforcer') {
+      const baton = createPart(new THREE.CylinderGeometry(0.065, 0.065, 0.9, 8), 0x9f7bff, 0x9f7bff, 1.5);
+      baton.position.set(0.7, bodyHeight / 2 + 0.05, -0.12);
+      baton.rotation.z = Math.PI / 2.8;
+      this.visual.add(baton);
+    }
   }
 }

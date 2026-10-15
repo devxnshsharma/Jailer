@@ -772,6 +772,7 @@ export class Game {
       objective: this.missions.isBossMission ? 'Defeat Rathna Veyil' : mission?.objective ?? 'Find the next signal',
       progress: this.missions.isBossMission ? 'FINAL' : `${this.missions.progressCount} / ${mission?.target ?? 0}`,
       weapon: this.weapons.getStatus(),
+      aiming: this.input.isDown('aim'),
       bossHealth: this.boss?.alive ? this.boss.health : undefined,
       bossMaxHealth: this.boss?.alive ? this.boss.maxHealth : undefined,
     });
@@ -784,10 +785,11 @@ export class Game {
     const heroPosition = this.hero.group.position;
     const forward = this.hero.getForward().clone();
     const shoulder = new THREE.Vector3(forward.z, 0, -forward.x).normalize();
+    const aiming = this.input.isDown('aim');
     const desired = heroPosition.clone()
-      .addScaledVector(forward, -7.6)
-      .addScaledVector(shoulder, 1.15)
-      .add(new THREE.Vector3(0, 4.4, 0));
+      .addScaledVector(forward, aiming ? -5.2 : -7.6)
+      .addScaledVector(shoulder, aiming ? 0.82 : 1.15)
+      .add(new THREE.Vector3(0, aiming ? 3.5 : 4.4, 0));
     this.camera.position.lerp(desired, Math.min(1, delta * 5.5));
     if (this.cameraShake > 0) {
       this.camera.position.x += (Math.random() - 0.5) * this.cameraShake * 0.34;

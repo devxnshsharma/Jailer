@@ -234,6 +234,14 @@ button { font: inherit; }
 
 .combo-readout { position: absolute; top: 48%; left: 50%; color: var(--gold); font-family: var(--display); font-size: clamp(1.3rem, 3vw, 2.5rem); font-weight: 800; letter-spacing: 0.08em; text-shadow: 0 0 22px rgba(255, 200, 87, 0.75); transform: translate(-50%, 20px); opacity: 0; transition: opacity 160ms ease, transform 220ms var(--ease-out); }
 .combo-readout.is-visible { opacity: 1; transform: translate(-50%, 0); }
+.aim-reticle { position: absolute; top: 50%; left: 50%; width: 1.55rem; height: 1.55rem; pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(0.72); transition: opacity 150ms ease, transform 180ms var(--ease-out); }
+.aim-reticle.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.aim-reticle span { position: absolute; display: block; width: 0.35rem; height: 1px; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.aim-reticle span:nth-child(1) { top: 0.12rem; left: 0.6rem; }
+.aim-reticle span:nth-child(2) { top: 0.6rem; right: 0.12rem; transform: rotate(90deg); }
+.aim-reticle span:nth-child(3) { bottom: 0.12rem; left: 0.6rem; }
+.aim-reticle span:nth-child(4) { top: 0.6rem; left: 0.12rem; transform: rotate(90deg); }
+.aim-reticle b { position: absolute; top: 0.41rem; left: 0.68rem; color: var(--gold); font: 0.55rem/1 var(--mono); }
 .toast { position: absolute; top: 20%; left: 50%; padding: 0.7rem 1rem; color: var(--ink); background: rgba(8, 12, 21, 0.86); border: 1px solid var(--gold); font-size: 0.66rem; letter-spacing: 0.12em; opacity: 0; transform: translate(-50%, -10px); transition: opacity 180ms ease, transform 220ms var(--ease-out); }
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 .toast[data-accent='pink'] { border-color: var(--pink); }
