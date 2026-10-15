@@ -696,7 +696,11 @@ export class Game {
     const projectile = this.projectiles[index];
     this.scene.remove(projectile.mesh);
     projectile.mesh.geometry.dispose();
-    projectile.mesh.material.dispose();
+    if (Array.isArray(projectile.mesh.material)) {
+      projectile.mesh.material.forEach((material) => material.dispose());
+    } else {
+      projectile.mesh.material.dispose();
+    }
     this.projectiles.splice(index, 1);
   }
 
