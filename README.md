@@ -109,9 +109,10 @@ npm run build
 The current logic suite covers health damage/healing, special-meter gain and
 consumption, cooldown boundaries, combo progression, mission progress and
 completion, and score calculation. Mission-manager tests cover first-mission
-completion, progression reset, and the final boss slot. The pure helpers live
-in `src/game/logic.ts` and do not depend on Three.js or browser APIs. There are
-currently 10 tests across 2 files.
+completion, progression reset, and the final boss slot. Weapon tests cover
+ammo/reload boundaries plus the complete native inventory list and cycling.
+The pure helpers live in `src/game/logic.ts` and do not depend on Three.js or
+browser APIs. There are currently 14 tests across 3 files.
 
 ## Docker deployment
 

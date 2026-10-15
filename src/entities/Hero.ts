@@ -213,6 +213,10 @@ export class Hero {
     return this.group.position.clone().addScaledVector(this.direction, 1.18).add(new THREE.Vector3(0, 1.55, 0));
   }
 
+  triggerWeaponSwing(kind: AttackKind = 'light'): void {
+    this.startAttack(kind);
+  }
+
   setWeaponVisual(id: WeaponId): void {
     this.activeWeapon = id;
     this.weaponVisual.clear();

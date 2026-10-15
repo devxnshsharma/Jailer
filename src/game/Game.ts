@@ -572,6 +572,7 @@ export class Game {
       : muzzle.clone().addScaledVector(forward, shot.range);
 
     if (shot.mode === 'melee') {
+      this.hero.triggerWeaponSwing(shot.weapon.id === 'baseballBat' ? 'heavy' : 'light');
       this.effects.slash(this.hero.getAttackPosition(), shot.color);
       this.cameraShake = Math.max(this.cameraShake, shot.weapon.id === 'baseballBat' ? 0.28 : 0.12);
       this.audio.play(shot.weapon.id === 'baseballBat' ? 'heavy' : 'hit');
@@ -596,12 +597,33 @@ export class Game {
       return;
     }
 
+    if (shot.mode === 'flame') {
+      this.effects.tracer(muzzle, endpoint, shot.color);
+      this.effects.burst(endpoint, shot.color, 8, 1.4);
+      for (const enemy of this.enemies) {
+        if (!enemy.alive) continue;
+        const offset = enemy.group.position.clone().sub(this.hero.group.position);
+        const distance = offset.length();
+        if (distance > shot.range || this.hero.getForward().dot(offset.normalize()) < 0.12) continue;
+        const damage = shot.damage * (1.2 - Math.min(0.65, distance / shot.range * 0.65));
+        this.applyDirectShotDamage(enemy, damage, shot.color, 4);
+      }
+      if (this.boss?.alive) {
+        const offset = this.boss.group.position.clone().sub(this.hero.group.position);
+        const distance = offset.length();
+        if (distance <= shot.range && this.hero.getForward().dot(offset.normalize()) >= 0.12) {
+          this.applyDirectShotDamage(this.boss, shot.damage * 0.8, shot.color, 3);
+        }
+      }
+      return;
+    }
+
     if (!target) {
       return;
     }
 
     this.effects.tracer(muzzle, endpoint, shot.color);
-    this.applyDirectShotDamage(target, shot.damage * shot.pellets, shot.color, shot.weapon.id === 'scattergun' ? 9 : shot.mode === 'flame' ? 4 : 2.6);
+    this.applyDirectShotDamage(target, shot.damage * shot.pellets, shot.color, shot.weapon.id === 'scattergun' ? 9 : 2.6);
   }
 
   private applyDirectShotDamage(target: Enemy | Boss, damage: number, color: number, knockback: number): void {
