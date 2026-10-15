@@ -179,9 +179,9 @@ button { font: inherit; }
 .weapon-ammo strong { color: var(--gold); font-size: 2rem; line-height: 1; }
 .weapon-reload { height: 0.2rem; margin-top: 0.55rem; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 100ms linear; }
 .weapon-reload[data-active='false'] { opacity: 0; }
-.weapon-switches { display: flex; gap: 0.32rem; margin-top: 0.55rem; }
-.weapon-switches button { flex: 1; min-height: 1.45rem; color: var(--muted); background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.13); cursor: pointer; font-size: 0.57rem; letter-spacing: 0.08em; }
-.weapon-switches button:hover, .weapon-switches button:focus-visible { color: var(--gold); border-color: var(--gold); outline: none; }
+.weapon-switches { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.24rem; margin-top: 0.55rem; }
+.weapon-switches button { min-width: 0; min-height: 1.45rem; padding: 0.15rem 0.08rem; overflow: hidden; color: var(--muted); background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.13); cursor: pointer; font-size: 0.49rem; letter-spacing: 0.03em; text-overflow: ellipsis; white-space: nowrap; }
+.weapon-switches button:hover, .weapon-switches button:focus-visible, .weapon-switches button.is-active { color: var(--gold); border-color: var(--gold); outline: none; background: rgba(255,200,87,0.12); }
 .weapon-hint { margin-top: 0.5rem; color: rgba(237,241,248,0.52); font-size: 0.5rem; letter-spacing: 0.07em; }
 
 .player-bars {

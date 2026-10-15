@@ -1,6 +1,6 @@
 import { ABILITIES } from '../game/definitions';
 import { InputManager, type InputAction } from '../game/InputManager';
-import type { WeaponStatus } from '../game/WeaponSystem';
+import { WEAPONS, type WeaponStatus } from '../game/WeaponSystem';
 
 export interface HudState {
   health: number;
@@ -50,7 +50,7 @@ export class Hud {
         <div class="mission-objective" data-objective>Break the first Black Lotus squad</div>
         <div class="mission-progress" data-progress>0 / 5</div>
       </div>
-      <div class="weapon-card"><div class="weapon-kicker">ARMORY / <span data-weapon-short>V9</span></div><div class="weapon-name" data-weapon-name>VETRI-9 SIDEARM</div><div class="weapon-ammo"><strong data-weapon-ammo>12</strong><span>/</span><span data-weapon-reserve>72</span></div><div class="weapon-reload" data-weapon-reload></div><div class="weapon-switches"><button data-weapon-switch="weapon1">V9</button><button data-weapon-switch="weapon2">K12</button><button data-weapon-switch="weapon3">MC</button></div><div class="weapon-hint">Z / X / C SWITCH · R RELOAD · CLICK FIRE</div></div>
+       <div class="weapon-card"><div class="weapon-kicker">DEMO ARMORY / <span data-weapon-short>45</span></div><div class="weapon-name" data-weapon-name>COLT .45</div><div class="weapon-ammo"><strong data-weapon-ammo>12</strong><span>/</span><span data-weapon-reserve>72</span></div><div class="weapon-reload" data-weapon-reload></div><div class="weapon-switches" data-weapon-switches></div><div class="weapon-hint">Z→] / TAB CYCLE · R RELOAD · CLICK FIRE</div></div>
       <div class="player-bars">
         <div class="bar-block"><div class="bar-label"><span>VETRI</span><span data-health-label>100 / 100</span></div><div class="bar health-bar"><div class="bar-fill" data-health></div></div></div>
         <div class="bar-block meter-block"><div class="bar-label"><span>AURA METER</span><span data-meter-label>38%</span></div><div class="bar meter-bar"><div class="bar-fill" data-meter></div></div></div>
@@ -81,14 +81,22 @@ export class Hud {
     this.weaponAmmo = this.root.querySelector('[data-weapon-ammo]') as HTMLSpanElement;
     this.weaponReserve = this.root.querySelector('[data-weapon-reserve]') as HTMLSpanElement;
     this.weaponReload = this.root.querySelector('[data-weapon-reload]') as HTMLDivElement;
-    this.root.querySelectorAll<HTMLButtonElement>('[data-weapon-switch]').forEach((button) => {
-      const action = button.dataset.weaponSwitch as InputAction;
+    const weaponSwitches = this.root.querySelector('[data-weapon-switches]') as HTMLDivElement;
+    WEAPONS.forEach((weapon, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.weaponSwitch = `weapon${index + 1}`;
+      button.dataset.weaponId = weapon.id;
+      button.title = weapon.demoName;
+      button.setAttribute('aria-label', `Equip ${weapon.label}`);
+      button.textContent = weapon.shortLabel;
       button.addEventListener('pointerdown', (event) => {
         event.preventDefault();
-        this.input.setVirtualAction(action, true);
+        this.input.setVirtualAction(`weapon${index + 1}` as InputAction, true);
       });
-      button.addEventListener('pointerup', () => this.input.setVirtualAction(action, false));
-      button.addEventListener('pointercancel', () => this.input.setVirtualAction(action, false));
+      button.addEventListener('pointerup', () => this.input.setVirtualAction(`weapon${index + 1}` as InputAction, false));
+      button.addEventListener('pointercancel', () => this.input.setVirtualAction(`weapon${index + 1}` as InputAction, false));
+      weaponSwitches.append(button);
     });
     this.buildAbilities();
     this.buildTouchControls();
@@ -104,14 +112,17 @@ export class Hud {
     this.missionTitle.textContent = state.missionTitle;
     this.objective.textContent = state.objective;
     this.weaponName.textContent = state.weapon.label;
-    this.weaponAmmo.textContent = String(state.weapon.ammo).padStart(2, '0');
-    this.weaponReserve.textContent = String(state.weapon.reserve).padStart(3, '0');
+    this.weaponAmmo.textContent = state.weapon.usesAmmo ? String(state.weapon.ammo).padStart(2, '0') : '∞';
+    this.weaponReserve.textContent = state.weapon.usesAmmo ? String(state.weapon.reserve).padStart(3, '0') : '—';
     this.weaponReload.style.transform = `scaleX(${state.weapon.reloading ? state.weapon.reloadProgress : 0})`;
     this.weaponReload.dataset.active = state.weapon.reloading ? 'true' : 'false';
     const reticle = this.root.querySelector('[data-reticle]');
     reticle?.classList.toggle('is-visible', state.aiming);
     const weaponShort = this.root.querySelector('[data-weapon-short]');
-    if (weaponShort) weaponShort.textContent = state.weapon.id === 'pistol' ? 'V9' : state.weapon.id === 'scattergun' ? 'K12' : 'MC';
+    if (weaponShort) weaponShort.textContent = state.weapon.shortLabel;
+    this.root.querySelectorAll<HTMLButtonElement>('[data-weapon-switch]').forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.weaponId === state.weapon.id);
+    });
     const progressElement = this.root.querySelector('[data-progress]');
     if (progressElement) {
       progressElement.textContent = state.progress;

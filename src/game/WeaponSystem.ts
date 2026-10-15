@@ -39,6 +39,7 @@ export interface WeaponDefinition {
 export interface WeaponStatus {
   id: WeaponId;
   label: string;
+  shortLabel: string;
   ammo: number;
   magazineSize: number;
   reserve: number;
@@ -415,6 +416,7 @@ export class WeaponSystem {
     return {
       id: weapon.id,
       label: weapon.label,
+      shortLabel: weapon.shortLabel,
       ammo: this.ammo[this.activeIndex],
       magazineSize: weapon.magazineSize,
       reserve: this.reserve[this.activeIndex],

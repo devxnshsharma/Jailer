@@ -16,6 +16,19 @@ export type InputAction =
   | 'weapon1'
   | 'weapon2'
   | 'weapon3'
+  | 'weapon4'
+  | 'weapon5'
+  | 'weapon6'
+  | 'weapon7'
+  | 'weapon8'
+  | 'weapon9'
+  | 'weapon10'
+  | 'weapon11'
+  | 'weapon12'
+  | 'weapon13'
+  | 'weapon14'
+  | 'weaponNext'
+  | 'weaponPrevious'
   | 'aim';
 
 const KEY_BINDINGS: Record<string, InputAction> = {
@@ -42,6 +55,28 @@ const KEY_BINDINGS: Record<string, InputAction> = {
   X: 'weapon2',
   c: 'weapon3',
   C: 'weapon3',
+  v: 'weapon4',
+  V: 'weapon4',
+  b: 'weapon5',
+  B: 'weapon5',
+  n: 'weapon6',
+  N: 'weapon6',
+  m: 'weapon7',
+  M: 'weapon7',
+  ',': 'weapon8',
+  '<': 'weapon8',
+  '.': 'weapon9',
+  '>': 'weapon9',
+  '/': 'weapon10',
+  '?': 'weapon10',
+  ';': 'weapon11',
+  ':': 'weapon11',
+  "'": 'weapon12',
+  '"': 'weapon12',
+  '[': 'weapon13',
+  '{': 'weapon13',
+  ']': 'weapon14',
+  '}': 'weapon14',
   Control: 'aim',
 };
 
@@ -52,12 +87,14 @@ export class InputManager {
   private readonly virtualMovement = new THREE.Vector2();
   private readonly movement = new THREE.Vector2();
   private readonly onKeyDown = (event: KeyboardEvent) => {
-    if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    if ([' ', 'Tab', 'Backspace', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
       event.preventDefault();
     }
 
     this.keys.add(event.key);
-    const action = KEY_BINDINGS[event.key];
+    const action = event.key === 'Tab'
+      ? (event.shiftKey ? 'weaponPrevious' : 'weaponNext')
+      : KEY_BINDINGS[event.key];
     if (action) {
       this.pressed.add(action);
     }
@@ -117,8 +154,12 @@ export class InputManager {
       return this.keys.has('Shift');
     }
 
-    if (action === 'shoot' || action === 'aim') {
-      return this.keys.has('l') || this.keys.has('L') || this.keys.has('Control') || this.virtualActions.has(action);
+    if (action === 'shoot') {
+      return this.keys.has('l') || this.keys.has('L') || this.virtualActions.has(action);
+    }
+
+    if (action === 'aim') {
+      return this.keys.has('Control') || this.virtualActions.has(action);
     }
 
     return false;
