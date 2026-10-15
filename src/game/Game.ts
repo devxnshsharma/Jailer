@@ -10,7 +10,7 @@ import { AudioManager } from './AudioManager';
 import { ABILITIES, MISSIONS } from './definitions';
 import { EffectsSystem } from './EffectsSystem';
 import { InputManager } from './InputManager';
-import { calculateScore, isCooldownReady } from './logic';
+import { calculateScore } from './logic';
 import type { AbilityId, GamePhase, SaveData } from './types';
 import { createCity } from '../world/City';
 import { WeatherSystem } from '../world/WeatherSystem';
@@ -225,6 +225,9 @@ export class Game {
   private beginMission(): void {
     const mission = this.missions.current;
     if (!mission) return;
+    this.missionCompletionQueued = false;
+    this.missionCompleteTimer = 0;
+    this.bossVictoryQueued = false;
     this.clearActors();
     this.hero.reset(mission.arena.clone().add(new THREE.Vector3(0, 0, 4)));
     const count = mission.target;
@@ -241,6 +244,16 @@ export class Game {
     this.phase = 'playing';
     this.screens.hide();
     this.hud.flash(`${mission.title} — MAKE AN ENTRY`, 'pink');
+    const radioLines: Record<string, string> = {
+      'neon-bazaar': 'NILA SIGNAL: “Vetri… the lights are moving.”',
+      'rooftop-reckoning': 'NILA SIGNAL: “Follow the red kite. Do not stop.”',
+      'iron-hideout': 'NILA SIGNAL: “The last door is beneath the old bell.”',
+    };
+    window.setTimeout(() => {
+      if (this.phase === 'playing' && this.missions.current?.id === mission.id) {
+        this.hud.flash(radioLines[mission.id] ?? 'NILA SIGNAL: “I know you are coming.”', 'cyan');
+      }
+    }, 1100);
     this.audio.play('menu');
   }
 
@@ -252,6 +265,9 @@ export class Game {
   }
 
   private beginBoss(): void {
+    this.missionCompletionQueued = false;
+    this.missionCompleteTimer = 0;
+    this.bossVictoryQueued = false;
     this.clearActors();
     this.hero.reset(new THREE.Vector3(0, 0, 8));
     this.boss = new Boss(new THREE.Vector3(0, 0, -4));
@@ -498,7 +514,7 @@ export class Game {
   private useAbility(id: AbilityId): void {
     const definition = ABILITIES.find((ability) => ability.id === id);
     if (!definition) return;
-    if (!isCooldownReady(this.elapsed * 1000, this.elapsed * 1000 - this.abilityTimers[id] * 1000, definition.cooldown * 1000)) {
+    if (this.abilityTimers[id] > 0) {
       this.hud.flash(`${definition.label} RECHARGING`, 'muted');
       return;
     }
@@ -710,7 +726,11 @@ export class Game {
   private updateCamera(delta: number): void {
     const heroPosition = this.hero.group.position;
     const forward = this.hero.getForward().clone();
-    const desired = heroPosition.clone().addScaledVector(forward, -7.6).add(new THREE.Vector3(0, 4.4, 0));
+    const shoulder = new THREE.Vector3(forward.z, 0, -forward.x).normalize();
+    const desired = heroPosition.clone()
+      .addScaledVector(forward, -7.6)
+      .addScaledVector(shoulder, 1.15)
+      .add(new THREE.Vector3(0, 4.4, 0));
     this.camera.position.lerp(desired, Math.min(1, delta * 5.5));
     if (this.cameraShake > 0) {
       this.camera.position.x += (Math.random() - 0.5) * this.cameraShake * 0.34;

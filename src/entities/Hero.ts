@@ -18,7 +18,8 @@ const HERO_COLORS = {
   shirt: 0xe3e1db,
   trousers: 0x77654d,
   skin: 0xb97858,
-  hair: 0x252735,
+  hair: 0x717787,
+  hairShadow: 0x252735,
   glasses: 0x0b101b,
   shoe: 0x353443,
   belt: 0x171a25,
@@ -289,7 +290,7 @@ export class Hero {
     hair.position.set(0, 3.06, 0.01);
     this.visual.add(hair);
     for (const [x, z, rotation] of [[-0.22, -0.02, -0.22], [0.18, -0.04, 0.2], [0, 0.12, 0]]) {
-      const tuft = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.3, 4, 8), new THREE.MeshStandardMaterial({ color: HERO_COLORS.hair }));
+      const tuft = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.3, 4, 8), new THREE.MeshStandardMaterial({ color: HERO_COLORS.hairShadow }));
       tuft.position.set(x, 3.15, z);
       tuft.rotation.z = rotation;
       this.visual.add(tuft);

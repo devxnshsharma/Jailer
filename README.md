@@ -90,8 +90,10 @@ npm run build
 
 The current logic suite covers health damage/healing, special-meter gain and
 consumption, cooldown boundaries, combo progression, mission progress and
-completion, and score calculation. The helpers live in
-`src/game/logic.ts` and do not depend on Three.js or browser APIs.
+completion, and score calculation. Mission-manager tests cover first-mission
+completion, progression reset, and the final boss slot. The pure helpers live
+in `src/game/logic.ts` and do not depend on Three.js or browser APIs. There are
+currently 10 tests across 2 files.
 
 ## Docker deployment
 
@@ -109,6 +111,9 @@ docker run --rm -p 8080:80 mass-metro-shadow-of-muthu-nagar
 
 Open <http://localhost:8080/>. The multi-stage `Dockerfile` builds the Vite
 artifact with Node 22 and serves `dist/` through nginx using `nginx.conf`.
+If Docker Desktop or another Docker daemon is not running, the image command
+cannot be verified locally; the command above is still the exact clean-Linux
+path.
 
 ## Vercel deployment
 
