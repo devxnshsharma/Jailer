@@ -61,6 +61,7 @@ export class Game {
   private saveData: SaveData;
   private timeSlow = 0;
   private auraTimer = 0;
+  private outOfBoundsNoticeAt = -Infinity;
   private victoryTimer = 0;
   private missionCompleteTimer = 0;
   private missionCompletionQueued = false;
@@ -330,6 +331,14 @@ export class Game {
     }
 
     this.hero.update(delta, this.input);
+    const maxDistanceFromMission = this.missions.isBossMission ? 22 : 17;
+    if (!this.missions.isBossMission && this.missions.current && this.hero.group.position.distanceTo(this.missions.current.arena) > maxDistanceFromMission) {
+      this.hero.group.position.lerp(this.missions.current.arena.clone().add(new THREE.Vector3(0, 0, 4)), delta * 0.08);
+      if (this.elapsed - this.outOfBoundsNoticeAt > 2.8) {
+        this.outOfBoundsNoticeAt = this.elapsed;
+        this.hud.flash('STAY WITHIN THE SIGNAL ZONE', 'muted');
+      }
+    }
     this.handleHeroAttack();
     this.handleAbilities();
     this.updateEnemies(delta);

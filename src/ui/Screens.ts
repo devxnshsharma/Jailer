@@ -107,6 +107,7 @@ export class Screens {
       <h2>${isFinalMission ? 'THE BELL BREAKS' : title}</h2>
       <p class="briefing-subtitle">${isFinalMission ? 'Muthu Nagar will remember this entry.' : 'The Black Lotus line just lost another link.'}</p>
       <div class="reward-grid"><div><span>REWARD</span><strong>+${reward} CRED</strong></div><div><span>SCORE</span><strong>${String(score).padStart(6, '0')}</strong></div></div>
+      <p class="briefing-line">${isFinalMission ? 'Every street light is a little brighter now.' : 'The next signal is waiting beyond the smoke.'}</p>
       <div class="menu-actions"></div>
     `);
     const actions = this.panel.querySelector('.menu-actions') as HTMLDivElement;

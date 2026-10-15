@@ -4,6 +4,7 @@ export class AudioManager {
   private context: AudioContext | null = null;
   private enabled = true;
   private ambientTimer: number | null = null;
+  private ambientStep = 0;
 
   constructor(enabled = true) {
     this.enabled = enabled;
@@ -79,9 +80,11 @@ export class AudioManager {
       const now = this.context.currentTime;
       const oscillator = this.context.createOscillator();
       const gain = this.context.createGain();
+      const notes = [68, 81, 91, 102, 81, 72, 61, 76];
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(68, now);
-      gain.gain.setValueAtTime(0.008, now);
+      oscillator.frequency.setValueAtTime(notes[this.ambientStep % notes.length], now);
+      this.ambientStep += 1;
+      gain.gain.setValueAtTime(0.012, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
       oscillator.connect(gain).connect(this.context.destination);
       oscillator.start(now);
