@@ -60,15 +60,15 @@ export class Screens {
 
   showBriefing(mission: MissionDefinition | null, index: number, isBoss = false): void {
     const title = isBoss ? 'THE LAST BELL' : mission?.title ?? 'NEXT STREET';
-    const subtitle = isBoss ? 'Rathna Veyil is waiting inside the dead factory.' : mission?.subtitle ?? '';
+    const subtitle = isBoss ? 'Rathna Veyil is waiting beneath the temple bell.' : mission?.subtitle ?? '';
     const objective = isBoss ? 'Break the syndicate. Bring Nila home.' : mission?.objective ?? '';
     const lore = isBoss
-      ? 'Rathna built the Black Lotus Combine on fear. Vetri is going to dismantle it one bell at a time.'
+      ? 'Rathna built the Black Lotus Combine on fear. Vetri is going to dismantle it beneath the old kovil bell.'
       : index === 0
-        ? 'Nila\'s emergency frequency cuts through the bazaar. The first squad is already waiting.'
+        ? 'Nila\'s emergency frequency cuts through the tea stalls. The first squad is already waiting by the gopuram.'
         : index === 1
-          ? 'The courier has the route to Nila. Follow the rooftops before the signal goes dark.'
-          : 'The hideout is an old freight terminal. Every locked door is another piece of the city to reclaim.';
+          ? 'The courier has the route to Nila. Follow the rooftops and bus wires before the signal goes dark.'
+          : 'The hideout is a salt-stained freight yard. Every locked container is another piece of the city to reclaim.';
     this.render(`
       <div class="briefing-stamp">MISSION ${String(index + 1).padStart(2, '0')} / ${isBoss ? 'FINAL' : '4'}</div>
       <h2>${title}</h2>

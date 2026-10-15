@@ -45,8 +45,8 @@ export const MISSIONS: MissionDefinition[] = [
   {
     id: 'neon-bazaar',
     title: 'NEON BAZAAR',
-    subtitle: 'The street remembers who protects it.',
-    objective: 'Break the first Black Lotus squad',
+    subtitle: 'Kovil Street is bright with rain, tea steam, and trouble.',
+    objective: 'Clear the temple-market Black Lotus squad',
     target: 5,
     enemyKinds: ['bruiser', 'lookout'],
     reward: 450,
@@ -56,8 +56,8 @@ export const MISSIONS: MissionDefinition[] = [
   {
     id: 'rooftop-reckoning',
     title: 'ROOFTOP RECKONING',
-    subtitle: 'Run the skyline. Cut the signal.',
-    objective: 'Silence the courier crew',
+    subtitle: 'Cross the old bus route before the courier reaches the flyover.',
+    objective: 'Silence the rooftop courier crew',
     target: 7,
     enemyKinds: ['blade', 'lookout', 'bruiser'],
     reward: 800,
@@ -67,8 +67,8 @@ export const MISSIONS: MissionDefinition[] = [
   {
     id: 'iron-hideout',
     title: 'IRON HIDEOUT',
-    subtitle: 'The syndicate built a fortress. Vetri brought thunder.',
-    objective: 'Crack the industrial guard line',
+    subtitle: 'Salt air, freight steel, and an armed harbour yard.',
+    objective: 'Crack the harbour-yard guard line',
     target: 9,
     enemyKinds: ['enforcer', 'bruiser', 'blade'],
     reward: 1250,

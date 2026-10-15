@@ -188,6 +188,180 @@ function addWaterTank(parent: THREE.Group, x: number, z: number, color: number):
   parent.add(tank);
 }
 
+function addTamilSign(parent: THREE.Group, x: number, y: number, z: number, color: number, text: string, rotation = 0): void {
+  const canvas = document.createElement('canvas');
+  canvas.width = 640;
+  canvas.height = 180;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  context.fillStyle = '#111522';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = `#${color.toString(16).padStart(6, '0')}`;
+  context.lineWidth = 10;
+  context.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+  context.fillStyle = '#edf1f8';
+  context.font = 'bold 62px sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(text, canvas.width / 2, canvas.height / 2 + 4);
+
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.6, 1.02),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, side: THREE.DoubleSide }),
+  );
+  sign.position.set(x, y, z);
+  sign.rotation.y = rotation;
+  parent.add(sign);
+}
+
+function addTamilFlagLine(parent: THREE.Group, x: number, z: number, color: number): void {
+  const pole = createBox(0.05, 2.3, 0.05, 0x8e7f68, 0x221a12, 0.1);
+  pole.position.set(x, 1.15, z);
+  parent.add(pole);
+  const flag = createBox(0.72, 0.36, 0.025, color, color, 0.6);
+  flag.position.set(x + 0.35, 2.02, z);
+  parent.add(flag);
+}
+
+function addCoconutPalm(parent: THREE.Group, x: number, z: number, lean = 0): void {
+  const palm = new THREE.Group();
+  palm.position.set(x, 0, z);
+  palm.rotation.z = lean;
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.13, 0.24, 5.2, 10),
+    new THREE.MeshStandardMaterial({ color: 0x72523a, roughness: 0.9 }),
+  );
+  trunk.position.y = 2.6;
+  trunk.castShadow = true;
+  palm.add(trunk);
+  const crown = new THREE.Group();
+  crown.position.y = 5.1;
+  for (let index = 0; index < 7; index += 1) {
+    const leaf = new THREE.Mesh(
+      new THREE.ConeGeometry(0.12, 2.3, 6),
+      new THREE.MeshStandardMaterial({ color: index % 2 === 0 ? 0x2e7257 : 0x47885d, roughness: 0.84 }),
+    );
+    leaf.rotation.z = Math.PI / 2;
+    leaf.rotation.y = (index / 7) * Math.PI * 2;
+    leaf.position.set(Math.cos(leaf.rotation.y) * 0.62, Math.sin(index * 1.9) * 0.08, Math.sin(leaf.rotation.y) * 0.62);
+    leaf.castShadow = true;
+    crown.add(leaf);
+  }
+  palm.add(crown);
+  parent.add(palm);
+}
+
+function addAutoRickshaw(parent: THREE.Group, x: number, z: number, rotation: number, color: number): void {
+  const auto = new THREE.Group();
+  auto.position.set(x, 0, z);
+  auto.rotation.y = rotation;
+  const body = createBox(1.55, 0.62, 1.08, color);
+  body.position.y = 0.56;
+  auto.add(body);
+  const roof = createBox(1.3, 0.12, 1.02, 0x171b25);
+  roof.position.set(-0.08, 1.46, 0);
+  auto.add(roof);
+  const windshield = createBox(0.1, 0.52, 0.78, 0x9bdbe0, 0x29414d, 0.3);
+  windshield.position.set(0.7, 1.02, 0);
+  auto.add(windshield);
+  const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x11131a, roughness: 0.84 });
+  for (const [wheelX, wheelZ] of [[0.43, -0.59], [0.43, 0.59], [-0.55, 0]]) {
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.14, 12), wheelMaterial);
+    wheel.rotation.x = Math.PI / 2;
+    wheel.position.set(wheelX, 0.28, wheelZ);
+    auto.add(wheel);
+  }
+  const headlamp = createBox(0.08, 0.12, 0.2, 0xfff0b0, 0xffc857, 3);
+  headlamp.position.set(0.79, 0.67, 0);
+  auto.add(headlamp);
+  parent.add(auto);
+}
+
+function addBus(parent: THREE.Group, x: number, z: number, rotation: number, color: number): void {
+  const bus = new THREE.Group();
+  bus.position.set(x, 0, z);
+  bus.rotation.y = rotation;
+  const body = createBox(4.6, 1.45, 1.6, color);
+  body.position.y = 1.05;
+  bus.add(body);
+  const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x152d3c, emissive: 0x153e4d, emissiveIntensity: 0.45, metalness: 0.2, roughness: 0.26 });
+  for (let index = -2; index <= 2; index += 1) {
+    const window = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.48, 0.04), windowMaterial);
+    window.position.set(index * 0.78 - 0.05, 1.4, -0.82);
+    bus.add(window);
+  }
+  const bumper = createBox(0.16, 0.24, 1.36, 0x2c303b, 0x111421, 0.2);
+  bumper.position.set(2.32, 0.52, 0);
+  bus.add(bumper);
+  parent.add(bus);
+}
+
+function addTempleGopuram(parent: THREE.Group, x: number, z: number, accent: number): void {
+  const temple = new THREE.Group();
+  temple.name = 'Tamil temple gopuram';
+  temple.position.set(x, 0, z);
+  const base = createBox(5.8, 0.45, 3.2, 0x4d3f48);
+  base.position.y = 0.23;
+  temple.add(base);
+  for (let level = 0; level < 5; level += 1) {
+    const width = 4.8 - level * 0.72;
+    const tier = createBox(width, 0.58, 2.45 - level * 0.3, level % 2 === 0 ? 0x7e5261 : 0x5f506d, accent, 0.25);
+    tier.position.y = 0.62 + level * 0.58;
+    temple.add(tier);
+    for (const side of [-1, 1]) {
+      const statue = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.42, 6), new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: 0.6 }));
+      statue.position.set(side * (width / 2 - 0.22), tier.position.y + 0.32, -0.93);
+      temple.add(statue);
+    }
+  }
+  const cap = new THREE.Mesh(new THREE.SphereGeometry(0.34, 12, 8), new THREE.MeshStandardMaterial({ color: 0xc6a05d, metalness: 0.78, roughness: 0.2, emissive: accent, emissiveIntensity: 0.5 }));
+  cap.position.y = 3.65;
+  temple.add(cap);
+  const bell = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.05, 8, 18), new THREE.MeshStandardMaterial({ color: 0xc6a05d, metalness: 0.72, roughness: 0.24 }));
+  bell.position.set(0, 2.55, -1.38);
+  bell.rotation.x = Math.PI / 2;
+  temple.add(bell);
+  parent.add(temple);
+  addTamilSign(parent, x, 2.1, z - 1.68, accent, 'முத்து நகர்');
+}
+
+function addKolam(parent: THREE.Group, x: number, z: number, color: number): void {
+  const kolam = new THREE.Group();
+  kolam.position.set(x, 0.09, z);
+  const material = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.72, side: THREE.DoubleSide });
+  for (let index = 0; index < 4; index += 1) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.35 + index * 0.28, 0.38 + index * 0.28, 16), material);
+    ring.rotation.x = -Math.PI / 2;
+    kolam.add(ring);
+  }
+  for (const side of [-1, 1]) {
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), material);
+    dot.position.set(side * 1.2, 0, 0);
+    kolam.add(dot);
+  }
+  parent.add(kolam);
+}
+
+function addHarbourCrane(parent: THREE.Group, x: number, z: number, color: number): void {
+  const crane = new THREE.Group();
+  crane.position.set(x, 0, z);
+  const left = createBox(0.24, 5.6, 0.24, 0x4b5362);
+  left.position.set(-2.2, 2.8, 0);
+  const right = createBox(0.24, 5.6, 0.24, 0x4b5362);
+  right.position.set(2.2, 2.8, 0);
+  const beam = createBox(4.6, 0.28, 0.28, color, color, 0.5);
+  beam.position.y = 5.4;
+  const trolley = createBox(0.42, 0.32, 0.4, color, color, 0.8);
+  trolley.position.set(0.9, 5.02, 0);
+  const cable = createBox(0.035, 2.8, 0.035, 0x171a25);
+  cable.position.set(0.9, 3.6, 0);
+  const hook = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.035, 6, 14, Math.PI), new THREE.MeshStandardMaterial({ color: 0xc6a05d, metalness: 0.64 }));
+  hook.position.set(0.9, 2.2, 0);
+  hook.rotation.z = Math.PI;
+  crane.add(left, right, beam, trolley, cable, hook);
+  parent.add(crane);
+}
+
 export interface CityBuild {
   group: THREE.Group;
   arenaMarkers: THREE.Group;
@@ -265,6 +439,10 @@ export function createCity(): CityBuild {
   addNeonSign(group, 12, 5.2, 3.9, COLORS.cyan, 2.6);
   addNeonSign(group, -4.2, 3.6, 13, COLORS.amber, 2.4);
   addNeonSign(group, 4.4, 4.5, -13, COLORS.lime, 2.2);
+  addTamilSign(group, -8.5, 2.8, 2.6, COLORS.amber, 'தேநீர்', Math.PI);
+  addTamilSign(group, 8.5, 2.6, -2.6, COLORS.cyan, 'பஜார்');
+  addTamilSign(group, 18.3, 4.8, -18.2, COLORS.pink, 'மாலை ரோடு', Math.PI / 2);
+  addTamilSign(group, -22, 3.7, -20.8, COLORS.purple, 'சாலை பணிகள்');
 
   for (let i = -32; i <= 32; i += 8) {
     addStreetLamp(group, i, -4.8, i % 16 === 0 ? COLORS.cyan : COLORS.pink);
@@ -275,6 +453,10 @@ export function createCity(): CityBuild {
   addMarketStall(group, -5.7, 3.2, COLORS.amber);
   addMarketStall(group, 8.5, -3.2, COLORS.cyan);
   addMarketStall(group, 5.7, -3.2, COLORS.purple);
+  addTamilFlagLine(group, -9.4, 3.2, COLORS.amber);
+  addTamilFlagLine(group, -7.6, 3.2, COLORS.pink);
+  addTamilFlagLine(group, 7.6, -3.2, COLORS.cyan);
+  addTamilFlagLine(group, 9.4, -3.2, COLORS.purple);
   addPuddle(group, -2.4, 1.1, 4.5, 1.2, 0x152b48);
   addPuddle(group, 4.8, 7.7, 2.3, 0.8, 0x17213d);
   addPuddle(group, -7.2, -5.9, 3.2, 0.9, 0x252343);
@@ -283,10 +465,21 @@ export function createCity(): CityBuild {
   addVehicle(group, -1.4, -1.5, Math.PI / 2, 0x5b6a8f);
   addVehicle(group, 10.5, 2.1, -Math.PI / 2, 0xb44c53, true);
   addVehicle(group, -10.5, -2.1, Math.PI / 2, 0x9c8156);
+  addAutoRickshaw(group, -3.6, 4.9, Math.PI / 2, 0x178c70);
+  addAutoRickshaw(group, 4.3, -5.2, -Math.PI / 2, 0xd2a23e);
+  addBus(group, 17.5, -5.6, Math.PI / 2, 0x365f7b);
+  addBus(group, -18.2, 5.7, -Math.PI / 2, 0x7b3e4c);
   addContainer(group, -27, -10.3, 0x424d63, 0.08);
   addContainer(group, -30, -8.8, 0x6a3f4e, 0.04);
   addWaterTank(group, -15.8, -30.6, 0x53657d);
   addWaterTank(group, 14.8, 29.5, 0x6c5863);
+  addCoconutPalm(group, -19.5, 8.5, -0.05);
+  addCoconutPalm(group, 20.5, 8.8, 0.08);
+  addCoconutPalm(group, 23.5, -8.5, -0.08);
+  addTempleGopuram(group, 0, -10.2, COLORS.amber);
+  addKolam(group, 0, 0, COLORS.amber);
+  addKolam(group, 18, -18, COLORS.cyan);
+  addHarbourCrane(group, -25, -19.5, COLORS.purple);
 
   const hideout = new THREE.Group();
   hideout.name = 'Iron Hideout';

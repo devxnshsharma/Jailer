@@ -251,9 +251,9 @@ export class Game {
     this.screens.hide();
     this.hud.flash(`${mission.title} — MAKE AN ENTRY`, 'pink');
     const radioLines: Record<string, string> = {
-      'neon-bazaar': 'NILA SIGNAL: “Vetri… the lights are moving.”',
-      'rooftop-reckoning': 'NILA SIGNAL: “Follow the red kite. Do not stop.”',
-      'iron-hideout': 'NILA SIGNAL: “The last door is beneath the old bell.”',
+      'neon-bazaar': 'NILA SIGNAL: “Vetri… the temple lights are moving.”',
+      'rooftop-reckoning': 'NILA SIGNAL: “Follow the red kite over the bus route.”',
+      'iron-hideout': 'NILA SIGNAL: “The freight door is beneath the harbour crane.”',
     };
     window.setTimeout(() => {
       if (this.phase === 'playing' && this.missions.current?.id === mission.id) {
