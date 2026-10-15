@@ -136,9 +136,34 @@ export function createCity(): CityBuild {
   const group = new THREE.Group();
   group.name = 'Muthu Nagar';
 
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(72, 32, 16),
+    new THREE.MeshBasicMaterial({ color: 0x0b1022, side: THREE.BackSide, fog: false }),
+  );
+  group.add(sky);
+  const starPositions = new Float32Array(240 * 3);
+  for (let index = 0; index < 240; index += 1) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 26 + Math.random() * 34;
+    starPositions[index * 3] = Math.cos(angle) * radius;
+    starPositions[index * 3 + 1] = 11 + Math.random() * 30;
+    starPositions[index * 3 + 2] = Math.sin(angle) * radius;
+  }
+  const stars = new THREE.Points(
+    new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3)),
+    new THREE.PointsMaterial({ color: 0xc7d6ff, size: 0.08, transparent: true, opacity: 0.7, sizeAttenuation: true }),
+  );
+  group.add(stars);
+  const moon = new THREE.Mesh(
+    new THREE.SphereGeometry(2.5, 20, 16),
+    new THREE.MeshBasicMaterial({ color: 0xcbd8ff, transparent: true, opacity: 0.86, fog: false }),
+  );
+  moon.position.set(23, 22, -32);
+  group.add(moon);
+
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(100, 100),
-    new THREE.MeshStandardMaterial({ color: COLORS.asphalt, roughness: 0.96, metalness: 0.03 }),
+    new THREE.MeshStandardMaterial({ color: COLORS.asphalt, roughness: 0.74, metalness: 0.16 }),
   );
   ground.rotation.x = -Math.PI / 2;
   group.add(ground);
