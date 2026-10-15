@@ -47,7 +47,7 @@ export class Screens {
       <div class="hero-card"><span>VETRI VARMAN</span><strong>THE QUIET STORM</strong><small>Former city fixer. Reluctant protector. Nila's last signal is somewhere beyond the neon.</small></div>
       <div class="menu-actions"></div>
       <div class="menu-meta"><span>HIGH SCORE <strong>${String(highScore).padStart(6, '0')}</strong></span><span>BUILD 01 · WEB</span></div>
-      <div class="control-strip"><span>WASD MOVE</span><span>J STRIKE</span><span>Q DODGE</span><span>1–4 AURA MOVES</span></div>
+      <div class="control-strip"><span>WASD MOVE</span><span>J STRIKE</span><span>L / CLICK FIRE</span><span>Z X C WEAPONS</span><span>1–4 AURA</span></div>
     `);
     const actions = this.panel.querySelector('.menu-actions') as HTMLDivElement;
     actions.append(createButton('BEGIN THE ENTRY', 'primary-button', this.callbacks.onStart));

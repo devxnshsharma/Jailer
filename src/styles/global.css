@@ -162,6 +162,25 @@ button { font: inherit; }
 .mission-objective { margin-top: 0.4rem; color: var(--muted); font-size: 0.68rem; line-height: 1.45; }
 .mission-progress { margin-top: 0.55rem; color: var(--cyan); font-size: 0.68rem; }
 
+.weapon-card {
+  position: absolute;
+  right: max(1.2rem, env(safe-area-inset-right));
+  bottom: max(13.1rem, calc(env(safe-area-inset-bottom) + 12rem));
+  width: min(19rem, 42vw);
+  padding: 0.9rem 1rem 0.78rem;
+  border: 1px solid rgba(255, 200, 87, 0.35);
+  background: linear-gradient(135deg, rgba(22, 24, 31, 0.9), rgba(8, 12, 20, 0.7));
+  backdrop-filter: blur(8px);
+}
+.weapon-kicker { color: var(--gold); font-size: 0.58rem; letter-spacing: 0.16em; }
+.weapon-kicker span { color: var(--ink); }
+.weapon-name { margin-top: 0.32rem; color: var(--ink); font-family: var(--display); font-size: 1.18rem; letter-spacing: 0.045em; }
+.weapon-ammo { display: flex; align-items: baseline; justify-content: end; gap: 0.3rem; margin-top: -0.2rem; color: var(--muted); font-family: var(--display); font-size: 1rem; }
+.weapon-ammo strong { color: var(--gold); font-size: 2rem; line-height: 1; }
+.weapon-reload { height: 0.2rem; margin-top: 0.55rem; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform 100ms linear; }
+.weapon-reload[data-active='false'] { opacity: 0; }
+.weapon-hint { margin-top: 0.5rem; color: rgba(237,241,248,0.52); font-size: 0.5rem; letter-spacing: 0.07em; }
+
 .player-bars {
   position: absolute;
   right: max(1.2rem, env(safe-area-inset-right));
@@ -281,6 +300,7 @@ button { font: inherit; }
   .mission-title { font-size: 1.15rem; }
   .mission-objective { font-size: 0.6rem; }
   .player-bars { right: 1rem; bottom: 8.4rem; left: 1rem; width: auto; }
+  .weapon-card { right: 1rem; bottom: 17rem; width: min(17rem, calc(100vw - 2rem)); }
   .ability-dock { right: 1rem; bottom: 12.1rem; left: 1rem; width: auto; }
   .ability-button { min-height: 2.7rem; }
   .ability-name { font-size: 0.6rem; }

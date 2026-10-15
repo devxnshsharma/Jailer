@@ -12,6 +12,7 @@ import { EffectsSystem } from './EffectsSystem';
 import { InputManager } from './InputManager';
 import { calculateScore } from './logic';
 import type { AbilityId, GamePhase, SaveData } from './types';
+import { WeaponSystem, type ShotPlan } from './WeaponSystem';
 import { createCity } from '../world/City';
 import { WeatherSystem } from '../world/WeatherSystem';
 import { MissionManager } from '../missions/MissionManager';
@@ -43,6 +44,7 @@ export class Game {
   private readonly input = new InputManager();
   private readonly audio: AudioManager;
   private readonly effects = new EffectsSystem();
+  private readonly weapons = new WeaponSystem();
   private readonly hero = new Hero();
   private readonly missions = new MissionManager();
   private readonly hud: Hud;
@@ -186,6 +188,8 @@ export class Game {
     this.clearActors();
     this.effects.clear();
     this.missions.start();
+    this.weapons.reset();
+    this.hero.setWeaponVisual(this.weapons.current.id);
     this.hero.reset(new THREE.Vector3(0, 0, 4));
     Object.keys(this.abilityTimers).forEach((key) => {
       this.abilityTimers[key as AbilityId] = 0;
@@ -337,6 +341,7 @@ export class Game {
     }
 
     this.timeSlow = Math.max(0, this.timeSlow - delta);
+    this.weapons.update(delta);
     this.auraTimer = Math.max(0, this.auraTimer - delta);
     if (this.auraTimer <= 0) {
       this.hero.setAura(false);
@@ -356,6 +361,7 @@ export class Game {
       }
     }
     this.handleHeroAttack();
+    this.handleWeapons();
     this.handleAbilities();
     this.updateEnemies(delta);
     this.updateBoss(delta);
@@ -494,6 +500,56 @@ export class Game {
     this.hero.markAttackHit();
     if (hitSomething) {
       this.cameraShake = Math.max(this.cameraShake, hitbox.damage > 20 ? 0.24 : 0.11);
+    }
+  }
+
+  private handleWeapons(): void {
+    const weaponActions: Array<'weapon1' | 'weapon2' | 'weapon3'> = ['weapon1', 'weapon2', 'weapon3'];
+    weaponActions.forEach((action, index) => {
+      if (this.input.consume(action) && this.weapons.switchTo(index)) {
+        this.hero.setWeaponVisual(this.weapons.current.id);
+        this.hud.flash(`${this.weapons.current.label} EQUIPPED`, 'cyan');
+        this.audio.play('menu');
+      }
+    });
+
+    if (this.input.consume('reload') && this.weapons.startReload()) {
+      this.hud.flash(`RELOADING ${this.weapons.current.shortLabel}`, 'gold');
+      this.audio.play('menu');
+    }
+
+    if (this.input.isDown('shoot')) {
+      const shot = this.weapons.tryFire();
+      if (shot) {
+        this.handlePlayerShot(shot);
+      }
+    }
+  }
+
+  private handlePlayerShot(shot: ShotPlan): void {
+    const muzzle = this.hero.getMuzzlePosition();
+    const forward = this.hero.getForward().clone().normalize();
+    const minimumFacing = shot.weapon.id === 'scattergun' ? -0.08 : 0.35;
+    const target = this.findNearestTarget(shot.range, minimumFacing);
+    const endpoint = target
+      ? target.group.position.clone().add(new THREE.Vector3(0, 1.05, 0))
+      : muzzle.clone().addScaledVector(forward, shot.range);
+    this.effects.muzzle(muzzle, shot.color);
+    this.effects.tracer(muzzle, endpoint, shot.color);
+    this.cameraShake = Math.max(this.cameraShake, shot.weapon.id === 'scattergun' ? 0.34 : 0.12);
+    this.audio.play(shot.weapon.id === 'scattergun' ? 'heavy' : 'hit');
+
+    if (!target) {
+      return;
+    }
+
+    const damage = shot.damage * shot.pellets;
+    const direction = target.group.position.clone().sub(this.hero.group.position).normalize();
+    if (target instanceof Enemy) {
+      target.takeDamage(damage, direction, shot.weapon.id === 'scattergun' ? 9 : 2.6);
+      this.onSuccessfulHit(target.group.position, damage, shot.color, target);
+    } else if (target.alive && target.takeDamage(damage, direction, shot.weapon.id === 'scattergun' ? 7 : 2)) {
+      this.onSuccessfulHit(target.group.position, damage, shot.color);
     }
   }
 
@@ -715,6 +771,7 @@ export class Game {
       missionTitle: this.missions.isBossMission ? 'THE LAST BELL' : mission?.title ?? 'MUTHU NAGAR',
       objective: this.missions.isBossMission ? 'Defeat Rathna Veyil' : mission?.objective ?? 'Find the next signal',
       progress: this.missions.isBossMission ? 'FINAL' : `${this.missions.progressCount} / ${mission?.target ?? 0}`,
+      weapon: this.weapons.getStatus(),
       bossHealth: this.boss?.alive ? this.boss.health : undefined,
       bossMaxHealth: this.boss?.alive ? this.boss.maxHealth : undefined,
     });

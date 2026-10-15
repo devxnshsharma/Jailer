@@ -55,6 +55,24 @@ export class EffectsSystem {
     this.addParticle(mesh, new THREE.Vector3(0, 0.4, 0), 0.8, 1.8);
   }
 
+  tracer(start: THREE.Vector3, end: THREE.Vector3, color: number): void {
+    const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+    const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.92 });
+    const line = new THREE.Line(geometry, material);
+    this.addParticle(line, new THREE.Vector3(), 0.075, 1);
+  }
+
+  muzzle(position: THREE.Vector3, color: number): void {
+    this.burst(position, color, 7, 1.8);
+    const flash = new THREE.Mesh(
+      new THREE.ConeGeometry(0.18, 0.48, 8),
+      new THREE.MeshBasicMaterial({ color: 0xfff0b0, transparent: true, opacity: 0.95 }),
+    );
+    flash.position.copy(position);
+    flash.rotation.x = Math.PI / 2;
+    this.addParticle(flash, new THREE.Vector3(0, 0, -1.5), 0.08, 1);
+  }
+
   update(delta: number): void {
     for (let index = this.particles.length - 1; index >= 0; index -= 1) {
       const particle = this.particles[index];
@@ -62,7 +80,7 @@ export class EffectsSystem {
       if (particle.life <= 0) {
         this.group.remove(particle.mesh);
         particle.mesh.traverse((child) => {
-          if (child instanceof THREE.Mesh) {
+          if (child instanceof THREE.Mesh || child instanceof THREE.Line) {
             child.geometry.dispose();
             if (Array.isArray(child.material)) {
               child.material.forEach((material) => material.dispose());
@@ -82,8 +100,11 @@ export class EffectsSystem {
       const scale = particle.scale * (1 + progress * 0.8);
       particle.mesh.scale.setScalar(scale);
       particle.mesh.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshBasicMaterial) {
-          child.material.opacity = Math.max(0, 1 - progress);
+        if ((child instanceof THREE.Mesh || child instanceof THREE.Line) && child.material instanceof THREE.Material) {
+          const material = child.material as THREE.Material & { opacity?: number; transparent?: boolean };
+          if (typeof material.opacity === 'number') {
+            material.opacity = Math.max(0, 1 - progress);
+          }
         }
       });
     }

@@ -1,5 +1,6 @@
 import { ABILITIES } from '../game/definitions';
 import { InputManager, type InputAction } from '../game/InputManager';
+import type { WeaponStatus } from '../game/WeaponSystem';
 
 export interface HudState {
   health: number;
@@ -11,6 +12,7 @@ export interface HudState {
   missionTitle: string;
   objective: string;
   progress: string;
+  weapon: WeaponStatus;
   bossHealth?: number;
   bossMaxHealth?: number;
 }
@@ -27,6 +29,10 @@ export class Hud {
   private readonly currency: HTMLSpanElement;
   private readonly combo: HTMLDivElement;
   private readonly toast: HTMLDivElement;
+  private readonly weaponName: HTMLDivElement;
+  private readonly weaponAmmo: HTMLSpanElement;
+  private readonly weaponReserve: HTMLSpanElement;
+  private readonly weaponReload: HTMLDivElement;
   private readonly abilityButtons = new Map<string, HTMLButtonElement>();
   private toastTimer: number | null = null;
 
@@ -43,6 +49,7 @@ export class Hud {
         <div class="mission-objective" data-objective>Break the first Black Lotus squad</div>
         <div class="mission-progress" data-progress>0 / 5</div>
       </div>
+      <div class="weapon-card"><div class="weapon-kicker">ARMORY / <span data-weapon-short>V9</span></div><div class="weapon-name" data-weapon-name>VETRI-9 SIDEARM</div><div class="weapon-ammo"><strong data-weapon-ammo>12</strong><span>/</span><span data-weapon-reserve>72</span></div><div class="weapon-reload" data-weapon-reload></div><div class="weapon-hint">Z / X / C SWITCH · R RELOAD · CLICK FIRE</div></div>
       <div class="player-bars">
         <div class="bar-block"><div class="bar-label"><span>VETRI</span><span data-health-label>100 / 100</span></div><div class="bar health-bar"><div class="bar-fill" data-health></div></div></div>
         <div class="bar-block meter-block"><div class="bar-label"><span>AURA METER</span><span data-meter-label>38%</span></div><div class="bar meter-bar"><div class="bar-fill" data-meter></div></div></div>
@@ -68,6 +75,10 @@ export class Hud {
     this.missionTitle = this.root.querySelector('[data-mission-title]') as HTMLDivElement;
     this.combo = this.root.querySelector('[data-combo]') as HTMLDivElement;
     this.toast = this.root.querySelector('[data-toast]') as HTMLDivElement;
+    this.weaponName = this.root.querySelector('[data-weapon-name]') as HTMLDivElement;
+    this.weaponAmmo = this.root.querySelector('[data-weapon-ammo]') as HTMLSpanElement;
+    this.weaponReserve = this.root.querySelector('[data-weapon-reserve]') as HTMLSpanElement;
+    this.weaponReload = this.root.querySelector('[data-weapon-reload]') as HTMLDivElement;
     this.buildAbilities();
     this.buildTouchControls();
   }
@@ -81,6 +92,13 @@ export class Hud {
     this.currency.textContent = String(Math.max(0, Math.floor(state.currency))).padStart(3, '0');
     this.missionTitle.textContent = state.missionTitle;
     this.objective.textContent = state.objective;
+    this.weaponName.textContent = state.weapon.label;
+    this.weaponAmmo.textContent = String(state.weapon.ammo).padStart(2, '0');
+    this.weaponReserve.textContent = String(state.weapon.reserve).padStart(3, '0');
+    this.weaponReload.style.transform = `scaleX(${state.weapon.reloading ? state.weapon.reloadProgress : 0})`;
+    this.weaponReload.dataset.active = state.weapon.reloading ? 'true' : 'false';
+    const weaponShort = this.root.querySelector('[data-weapon-short]');
+    if (weaponShort) weaponShort.textContent = state.weapon.id === 'pistol' ? 'V9' : state.weapon.id === 'scattergun' ? 'K12' : 'MC';
     const progressElement = this.root.querySelector('[data-progress]');
     if (progressElement) {
       progressElement.textContent = state.progress;

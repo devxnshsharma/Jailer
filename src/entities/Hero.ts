@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { damageHealth, gainSpecialMeter } from '../game/logic';
 import type { DamageEvent } from '../game/types';
 import { InputManager } from '../game/InputManager';
+import type { WeaponId } from '../game/WeaponSystem';
 
 export type AttackKind = 'light' | 'heavy';
 
@@ -20,7 +21,9 @@ const HERO_COLORS = {
   skin: 0xb97858,
   hair: 0x717787,
   hairShadow: 0x252735,
+  beard: 0x525867,
   glasses: 0x0b101b,
+  lens: 0x26334a,
   shoe: 0x353443,
   belt: 0x171a25,
 };
@@ -57,6 +60,8 @@ export class Hero {
   invulnerable = 0;
 
   private readonly visual = new THREE.Group();
+  private readonly weaponVisual = new THREE.Group();
+  private readonly caneVisual = new THREE.Group();
   private readonly legs: THREE.Mesh[] = [];
   private readonly arms: THREE.Mesh[] = [];
   private readonly auraRing: THREE.Mesh;
@@ -69,11 +74,18 @@ export class Hero {
   private jumpVelocity = 0;
   private hitFlashTimer = 0;
   private walkTime = 0;
+  private activeWeapon: WeaponId = 'pistol';
 
   constructor() {
     this.group.name = 'Vetri Varman';
     this.group.add(this.visual);
     this.buildModel();
+    this.weaponVisual.position.set(0.67, 1.53, -0.32);
+    this.visual.add(this.weaponVisual);
+    this.caneVisual.position.set(-0.86, 0.12, 0.12);
+    this.visual.add(this.caneVisual);
+    this.buildCane();
+    this.setWeaponVisual(this.activeWeapon);
     this.auraRing = new THREE.Mesh(
       new THREE.TorusGeometry(0.8, 0.035, 8, 28),
       new THREE.MeshBasicMaterial({ color: 0xffc857, transparent: true, opacity: 0.5 }),
@@ -197,6 +209,41 @@ export class Hero {
     return this.group.position.clone().addScaledVector(this.direction, offset).add(new THREE.Vector3(0, 1.15, 0));
   }
 
+  getMuzzlePosition(): THREE.Vector3 {
+    return this.group.position.clone().addScaledVector(this.direction, 1.18).add(new THREE.Vector3(0, 1.55, 0));
+  }
+
+  setWeaponVisual(id: WeaponId): void {
+    this.activeWeapon = id;
+    this.weaponVisual.clear();
+    const metal = new THREE.MeshStandardMaterial({ color: 0x171b27, metalness: 0.82, roughness: 0.24 });
+    const grip = new THREE.MeshStandardMaterial({ color: 0x4a302b, roughness: 0.66, metalness: 0.08 });
+    const accent = new THREE.MeshStandardMaterial({ color: id === 'pistol' ? 0xffc857 : id === 'scattergun' ? 0xff765e : 0x65ddff, emissive: id === 'pistol' ? 0xffc857 : id === 'scattergun' ? 0xff765e : 0x65ddff, emissiveIntensity: 1.5, metalness: 0.5, roughness: 0.24 });
+    const add = (geometry: THREE.BufferGeometry, material: THREE.Material, position: THREE.Vector3, rotation = new THREE.Euler()): void => {
+      const part = new THREE.Mesh(geometry, material);
+      part.position.copy(position);
+      part.rotation.copy(rotation);
+      part.castShadow = true;
+      this.weaponVisual.add(part);
+    };
+
+    if (id === 'pistol') {
+      add(new THREE.BoxGeometry(0.18, 0.2, 0.62), metal, new THREE.Vector3(0, 0, -0.22));
+      add(new THREE.BoxGeometry(0.15, 0.4, 0.18), grip, new THREE.Vector3(0, -0.25, -0.02), new THREE.Euler(0.16, 0, 0));
+      add(new THREE.BoxGeometry(0.11, 0.07, 0.18), accent, new THREE.Vector3(0, 0.09, -0.53));
+    } else if (id === 'scattergun') {
+      add(new THREE.CylinderGeometry(0.085, 0.085, 1.15, 10), metal, new THREE.Vector3(0, 0.05, -0.56), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.28, 0.23, 0.45), metal, new THREE.Vector3(0, 0, -0.12));
+      add(new THREE.BoxGeometry(0.2, 0.38, 0.22), grip, new THREE.Vector3(0, -0.26, 0.12), new THREE.Euler(0.18, 0, 0));
+      add(new THREE.BoxGeometry(0.13, 0.08, 0.13), accent, new THREE.Vector3(0, 0.14, -1.12));
+    } else {
+      add(new THREE.BoxGeometry(0.25, 0.25, 0.7), metal, new THREE.Vector3(0, 0, -0.27));
+      add(new THREE.CylinderGeometry(0.055, 0.055, 1.2, 8), metal, new THREE.Vector3(0, 0.01, -0.88), new THREE.Euler(Math.PI / 2, 0, 0));
+      add(new THREE.BoxGeometry(0.17, 0.34, 0.22), grip, new THREE.Vector3(0, -0.23, 0.01), new THREE.Euler(0.15, 0, 0));
+      add(new THREE.BoxGeometry(0.11, 0.08, 0.1), accent, new THREE.Vector3(0, 0.08, -1.5));
+    }
+  }
+
   reset(position = new THREE.Vector3(0, 0, 4)): void {
     this.group.position.copy(position);
     this.health = this.maxHealth;
@@ -280,10 +327,23 @@ export class Hero {
     const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.25, 12), new THREE.MeshStandardMaterial({ color: HERO_COLORS.skin }));
     neck.position.y = 2.4;
     this.visual.add(neck);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 12), new THREE.MeshStandardMaterial({ color: HERO_COLORS.skin, roughness: 0.85 }));
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 20, 14), new THREE.MeshStandardMaterial({ color: HERO_COLORS.skin, roughness: 0.85 }));
     head.scale.set(0.92, 1.08, 0.92);
     head.position.set(0, 2.75, -0.02);
     this.visual.add(head);
+
+    const beard = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 10), new THREE.MeshStandardMaterial({ color: HERO_COLORS.beard, roughness: 0.86 }));
+    beard.scale.set(0.88, 0.52, 0.72);
+    beard.position.set(0, 2.61, -0.22);
+    this.visual.add(beard);
+    const moustache = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.24, 5, 8), new THREE.MeshStandardMaterial({ color: HERO_COLORS.hairShadow, roughness: 0.8 }));
+    moustache.rotation.z = Math.PI / 2;
+    moustache.position.set(0, 2.72, -0.34);
+    this.visual.add(moustache);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.18, 8), new THREE.MeshStandardMaterial({ color: HERO_COLORS.skin, roughness: 0.8 }));
+    nose.rotation.x = -Math.PI / 2;
+    nose.position.set(0, 2.78, -0.37);
+    this.visual.add(nose);
 
     const hair = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 10), new THREE.MeshStandardMaterial({ color: HERO_COLORS.hair, roughness: 0.45, metalness: 0.08 }));
     hair.scale.set(1.02, 0.62, 1.02);
@@ -296,9 +356,17 @@ export class Hero {
       this.visual.add(tuft);
     }
 
-    const glasses = box(0.78, 0.16, 0.08, HERO_COLORS.glasses, 0x25314c, 0.3);
-    glasses.position.set(0, 2.78, -0.34);
+    const glasses = box(0.86, 0.1, 0.055, HERO_COLORS.glasses, 0x25314c, 0.3);
+    glasses.position.set(0, 2.83, -0.34);
     this.visual.add(glasses);
+    for (const side of [-1, 1]) {
+      const lens = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.18, 0.045), new THREE.MeshStandardMaterial({ color: HERO_COLORS.lens, transparent: true, opacity: 0.78, metalness: 0.45, roughness: 0.2 }));
+      lens.position.set(side * 0.21, 2.81, -0.37);
+      this.visual.add(lens);
+      const frame = box(0.035, 0.23, 0.07, HERO_COLORS.glasses);
+      frame.position.set(side * 0.4, 2.81, -0.36);
+      this.visual.add(frame);
+    }
     const bridge = box(0.14, 0.07, 0.08, HERO_COLORS.glasses);
     bridge.position.set(0, 2.78, -0.37);
     this.visual.add(bridge);
@@ -329,5 +397,24 @@ export class Hero {
     chain.position.set(0, 2.14, -0.34);
     chain.rotation.x = Math.PI / 2;
     this.visual.add(chain);
+    const pendant = new THREE.Mesh(new THREE.OctahedronGeometry(0.055, 0), new THREE.MeshStandardMaterial({ color: 0xc6a05d, metalness: 0.72, roughness: 0.22 }));
+    pendant.position.set(0, 2.03, -0.37);
+    this.visual.add(pendant);
+  }
+
+  private buildCane(): void {
+    const caneMaterial = new THREE.MeshStandardMaterial({ color: 0x2c2430, metalness: 0.35, roughness: 0.42 });
+    const tipMaterial = new THREE.MeshStandardMaterial({ color: 0x8e765d, metalness: 0.5, roughness: 0.3 });
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 1.7, 10), caneMaterial);
+    shaft.position.y = 0.84;
+    shaft.rotation.z = -0.03;
+    this.caneVisual.add(shaft);
+    const handle = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 8, 18, Math.PI), tipMaterial);
+    handle.position.set(0, 1.7, 0);
+    handle.rotation.z = Math.PI / 2;
+    this.caneVisual.add(handle);
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), tipMaterial);
+    tip.position.y = -0.02;
+    this.caneVisual.add(tip);
   }
 }
