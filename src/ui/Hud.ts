@@ -143,7 +143,7 @@ export class Hud {
     touch.className = 'touch-controls';
     touch.innerHTML = `
       <div class="joystick" aria-label="Movement control"><div class="joystick-knob"></div></div>
-      <div class="touch-actions"><button data-touch="dodge">DODGE</button><button data-touch="jump">JUMP</button><button data-touch="lightAttack" class="attack-touch">STRIKE</button></div>
+      <div class="touch-actions"><button data-touch="pause">PAUSE</button><button data-touch="dodge">DODGE</button><button data-touch="jump">JUMP</button><button data-touch="lightAttack" class="attack-touch">STRIKE</button></div>
     `;
     const joystick = touch.querySelector('.joystick') as HTMLDivElement;
     const knob = touch.querySelector('.joystick-knob') as HTMLDivElement;

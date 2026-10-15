@@ -4,6 +4,11 @@ Mass Metro: Shadow of Muthu Nagar is a browser-first Three.js action game set
 in a neon city. The game runs entirely in the browser: combat, missions,
 score, audio, and the local high-score save are client-side.
 
+The hero, city, story, audio cues, and visual language are original. The game
+uses a fictional Tamil-cinema-inspired protagonist, Vetri Varman, rather than
+embedding a real actor's likeness, film footage, film soundtrack, logos, or
+dialogue.
+
 ## Requirements
 
 - Node.js `22.14.0` (the version is pinned in `.nvmrc`)
