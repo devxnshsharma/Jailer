@@ -128,7 +128,7 @@ export class Hero {
       movementVector.normalize();
       this.direction.lerp(movementVector, Math.min(1, delta * 14)).normalize();
       this.group.position.addScaledVector(movementVector, speed * delta);
-      this.group.rotation.y = Math.atan2(this.direction.x, this.direction.z);
+      this.group.rotation.y = Math.atan2(-this.direction.x, -this.direction.z);
       this.walkTime += delta * speed;
     }
 
