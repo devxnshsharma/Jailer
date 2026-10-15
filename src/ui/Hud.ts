@@ -50,7 +50,7 @@ export class Hud {
         <div class="mission-objective" data-objective>Break the first Black Lotus squad</div>
         <div class="mission-progress" data-progress>0 / 5</div>
       </div>
-      <div class="weapon-card"><div class="weapon-kicker">ARMORY / <span data-weapon-short>V9</span></div><div class="weapon-name" data-weapon-name>VETRI-9 SIDEARM</div><div class="weapon-ammo"><strong data-weapon-ammo>12</strong><span>/</span><span data-weapon-reserve>72</span></div><div class="weapon-reload" data-weapon-reload></div><div class="weapon-hint">Z / X / C SWITCH · R RELOAD · CLICK FIRE</div></div>
+      <div class="weapon-card"><div class="weapon-kicker">ARMORY / <span data-weapon-short>V9</span></div><div class="weapon-name" data-weapon-name>VETRI-9 SIDEARM</div><div class="weapon-ammo"><strong data-weapon-ammo>12</strong><span>/</span><span data-weapon-reserve>72</span></div><div class="weapon-reload" data-weapon-reload></div><div class="weapon-switches"><button data-weapon-switch="weapon1">V9</button><button data-weapon-switch="weapon2">K12</button><button data-weapon-switch="weapon3">MC</button></div><div class="weapon-hint">Z / X / C SWITCH · R RELOAD · CLICK FIRE</div></div>
       <div class="player-bars">
         <div class="bar-block"><div class="bar-label"><span>VETRI</span><span data-health-label>100 / 100</span></div><div class="bar health-bar"><div class="bar-fill" data-health></div></div></div>
         <div class="bar-block meter-block"><div class="bar-label"><span>AURA METER</span><span data-meter-label>38%</span></div><div class="bar meter-bar"><div class="bar-fill" data-meter></div></div></div>
@@ -81,6 +81,15 @@ export class Hud {
     this.weaponAmmo = this.root.querySelector('[data-weapon-ammo]') as HTMLSpanElement;
     this.weaponReserve = this.root.querySelector('[data-weapon-reserve]') as HTMLSpanElement;
     this.weaponReload = this.root.querySelector('[data-weapon-reload]') as HTMLDivElement;
+    this.root.querySelectorAll<HTMLButtonElement>('[data-weapon-switch]').forEach((button) => {
+      const action = button.dataset.weaponSwitch as InputAction;
+      button.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        this.input.setVirtualAction(action, true);
+      });
+      button.addEventListener('pointerup', () => this.input.setVirtualAction(action, false));
+      button.addEventListener('pointercancel', () => this.input.setVirtualAction(action, false));
+    });
     this.buildAbilities();
     this.buildTouchControls();
   }
@@ -165,7 +174,7 @@ export class Hud {
     touch.className = 'touch-controls';
     touch.innerHTML = `
       <div class="joystick" aria-label="Movement control"><div class="joystick-knob"></div></div>
-      <div class="touch-actions"><button data-touch="pause">PAUSE</button><button data-touch="dodge">DODGE</button><button data-touch="jump">JUMP</button><button data-touch="lightAttack" class="attack-touch">STRIKE</button></div>
+      <div class="touch-actions"><button data-touch="pause">PAUSE</button><button data-touch="reload">RELOAD</button><button data-touch="dodge">DODGE</button><button data-touch="jump">JUMP</button><button data-touch="lightAttack" class="attack-touch">STRIKE</button></div>
     `;
     const joystick = touch.querySelector('.joystick') as HTMLDivElement;
     const knob = touch.querySelector('.joystick-knob') as HTMLDivElement;

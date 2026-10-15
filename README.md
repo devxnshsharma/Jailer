@@ -9,6 +9,14 @@ uses a fictional Tamil-cinema-inspired protagonist, Vetri Varman, rather than
 embedding a real actor's likeness, film footage, film soundtrack, logos, or
 dialogue.
 
+Vetri's procedural model now uses the supplied visual mood as a reference for
+an original mature action-hero silhouette: silver swept hair, dark rectangular
+frames, a salt-and-pepper beard, open pale shirt, chain, tan trousers, dark
+shoes, and a cane prop. It does not embed or reproduce the reference photos.
+The armory contains three original weapons: a V9 sidearm, Kaveri-12
+scattergun, and Monsoon carbine, with ammo, reloads, shoulder aiming, muzzle
+flashes, tracers, ranged enemy attacks, and mobile weapon switching.
+
 ## Requirements
 
 - Node.js `22.14.0` (the version is pinned in `.nvmrc`)
@@ -62,6 +70,10 @@ Then open the preview URL printed by Vite.
 | Dodge | `Q` |
 | Jump | `Space` |
 | Sprint | `Shift` |
+| Fire current weapon | `L` or left mouse button |
+| Aim / shoulder camera | `Ctrl` or right mouse button |
+| Reload | `R` |
+| Switch weapon | `Z` pistol · `X` scattergun · `C` carbine |
 | Pause/resume | `Escape` |
 | Abilities | `1`–`4` |
 
