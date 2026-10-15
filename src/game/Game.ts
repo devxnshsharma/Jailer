@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 import { Boss, type BossAction } from '../entities/Boss';
 import { Enemy, type EnemyAction } from '../entities/Enemy';
@@ -10,6 +13,7 @@ import { InputManager } from './InputManager';
 import { calculateScore, isCooldownReady } from './logic';
 import type { AbilityId, GamePhase, SaveData } from './types';
 import { createCity } from '../world/City';
+import { WeatherSystem } from '../world/WeatherSystem';
 import { MissionManager } from '../missions/MissionManager';
 import { Hud } from '../ui/Hud';
 import { Screens } from '../ui/Screens';
@@ -35,6 +39,7 @@ export class Game {
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 180);
   private readonly renderer: THREE.WebGLRenderer;
+  private readonly composer: EffectComposer;
   private readonly input = new InputManager();
   private readonly audio: AudioManager;
   private readonly effects = new EffectsSystem();
@@ -45,6 +50,7 @@ export class Game {
   private readonly enemies: Enemy[] = [];
   private readonly pickups: Pickup[] = [];
   private readonly projectiles: Projectile[] = [];
+  private readonly weather = new WeatherSystem();
   private readonly abilityTimers: Record<AbilityId, number> = {
     massEntry: 0,
     auraStrike: 0,
@@ -77,6 +83,9 @@ export class Game {
     this.renderer.toneMappingExposure = 1.12;
     this.renderer.domElement.className = 'game-canvas';
     this.mount.append(this.renderer.domElement);
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.72, 0.55, 0.72));
 
     this.scene.background = new THREE.Color(0x090c14);
     this.scene.fog = new THREE.FogExp2(0x101522, 0.018);
@@ -84,6 +93,7 @@ export class Game {
 
     const city = createCity();
     this.scene.add(city.group);
+    this.scene.add(this.weather.group);
     this.scene.add(this.effects.group);
     this.scene.add(this.hero.group);
 
@@ -112,6 +122,7 @@ export class Game {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+    this.composer.setSize(width, height);
   };
 
   private readonly loop = (now: number): void => {
@@ -122,9 +133,13 @@ export class Game {
       this.update(delta);
     } else {
       this.effects.update(delta);
+      this.weather.update(delta);
       this.updateCamera(delta);
     }
-    this.renderer.render(this.scene, this.camera);
+    if (this.phase === 'playing') {
+      this.weather.update(delta);
+    }
+    this.composer.render();
     requestAnimationFrame(this.loop);
   };
 
