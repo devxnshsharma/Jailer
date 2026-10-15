@@ -26,7 +26,10 @@ function createBox(
     emissive,
     emissiveIntensity,
   });
-  return new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
 }
 
 function addBuilding(parent: THREE.Group, x: number, z: number, width: number, depth: number, height: number, color: number): void {
