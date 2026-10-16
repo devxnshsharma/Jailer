@@ -21,9 +21,9 @@ test('native inventory and Tamil scenarios are represented', () => {
   }
 });
 
-test('runtime is Canvas 2D with no renderer dependency', () => {
+test('runtime is raw WebGL with no renderer framework dependency', () => {
   assert.match(css, /#world/);
-  assert.match(game, /getContext\(['"]2d/);
+  assert.match(game, /renderer3d/);
   assert.match(game, /state\.keys\.has\('l'\)/);
-  assert.doesNotMatch(game, /THREE|WebGLRenderer|EffectComposer/);
+  assert.doesNotMatch(game, /import[^\n]*from ['"](?:three|vite)/i);
 });

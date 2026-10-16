@@ -1,13 +1,13 @@
 # Mass Metro — Native Demo Web Runtime
 
 Mass Metro now runs as a dependency-free browser game. The web runtime uses
-one raw HTML page, Canvas 2D, and browser APIs only. It does not use Three.js,
-Vite, WebGL, React, or a game framework.
+one raw HTML page, WebGL 1, and browser APIs only. It does not use Three.js,
+Vite, React, or a game framework.
 
 The gameplay vocabulary is based on the native demo reference: the complete
 weapon inventory, melee/firearm/projectile/explosive modes, mission flow,
 vehicles, rain, wanted pressure, Tamil street landmarks, and boss finale are
-implemented with original Canvas primitives so the project can run without
+implemented with original low-poly WebGL primitives so the project can run without
 proprietary game binaries or missing native submodules.
 
 ## What is included
@@ -42,7 +42,7 @@ proprietary game binaries or missing native submodules.
 
 - Node.js `22.14.0` (pinned in `.nvmrc`)
 - npm bundled with Node.js
-- Any current browser with Canvas 2D support
+- Any current browser with WebGL support
 
 No package dependencies or external services are required.
 
@@ -105,7 +105,8 @@ npm test
 ```
 
 The tests verify the raw HTML entrypoint, absence of Three.js/Vite imports,
-Canvas 2D usage, complete demo inventory names, and Tamil scenario content.
+raw WebGL integration, complete demo inventory names, and Tamil scenario
+content.
 
 ## Docker deployment
 
@@ -121,7 +122,8 @@ runs the dependency-free static build, and serves `dist/` through nginx.
 
 ```text
 index.html             Static browser entrypoint
-web/game.js            Raw Canvas 2D game loop, world, combat, and UI updates
+web/game.js            Raw WebGL game loop, world, combat, and UI updates
+web/renderer3d.js      Dependency-free low-poly 3D renderer and camera
 web/styles.css         HUD and briefing screen styling
 tools/serve.mjs        Dependency-free local static server
 tools/build.mjs        Static production copy step

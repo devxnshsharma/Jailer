@@ -1,7 +1,9 @@
+import { create3DRenderer } from './renderer3d.js';
+
 /*
  * Mass Metro web runtime.
  *
- * This file intentionally uses only browser Canvas 2D and Web APIs. It does
+ * This file intentionally uses only raw browser WebGL and Web APIs. It does
  * not import Three.js, Vite, a renderer library, or a game framework. The
  * gameplay vocabulary follows the native demo reference: its inventory,
  * scenario progression, vehicle categories, rain, explosions, wanted-style
@@ -10,9 +12,9 @@
  */
 
 const canvas = document.querySelector('#world');
-const ctx = canvas.getContext('2d', { alpha: false });
 const shell = document.querySelector('#game');
-if (!canvas || !ctx || !shell) throw new Error('Mass Metro web runtime could not start.');
+if (!canvas || !shell) throw new Error('Mass Metro web runtime could not start.');
+const renderer3d = create3DRenderer(canvas);
 
 const TAU = Math.PI * 2;
 const WORLD = { width: 2200, height: 1400 };
@@ -129,10 +131,10 @@ function showMenu() {
   showScreen(`<span class="stamp">NATIVE DEMO WEB RUNTIME · NO ENGINE DEPENDENCIES</span>
     <h1>MASS<br><em>METRO</em></h1>
     <p class="sub">SHADOW OF MUTHU NAGAR</p>
-    <p class="copy">A raw browser runtime built from Canvas 2D and the native demo's gameplay vocabulary: full weapon inventory, mission flow, rain, Tamil street landmarks, vehicles, projectiles, fire, and explosions.</p>
+    <p class="copy">A raw browser 3D runtime built from WebGL and the native demo's gameplay vocabulary: full weapon inventory, mission flow, rain, Tamil street landmarks, vehicles, projectiles, fire, and explosions.</p>
     <div class="objective"><span>PLAYER PROFILE</span><b>VETRI VARMAN · CITY FIXER</b></div>
     <div class="screen-actions"><button class="primary" data-start>BEGIN THE ENTRY</button><button data-sound>${state.sound ? 'SOUND: ON' : 'SOUND: OFF'}</button></div>
-    <div class="screen-meta"><span>HIGH SCORE ${formatNumber(state.highScore)}</span><span>CANVAS 2D · STATIC WEB</span></div>`);
+    <div class="screen-meta"><span>HIGH SCORE ${formatNumber(state.highScore)}</span><span>RAW WEBGL 3D · STATIC WEB</span></div>`);
   setButtonAction('[data-start]', startRun);
   const sound = ui.card.querySelector('[data-sound]');
   sound?.addEventListener('click', () => { state.sound = !state.sound; sound.textContent = state.sound ? 'SOUND: ON' : 'SOUND: OFF'; });
@@ -227,10 +229,7 @@ function beginMission() {
 }
 
 function resize() {
-  const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.floor(canvas.clientWidth * ratio);
-  canvas.height = Math.floor(canvas.clientHeight * ratio);
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  renderer3d.resize();
   if (!state.mouse.x && !state.mouse.y) {
     state.mouse.x = canvas.clientWidth / 2;
     state.mouse.y = canvas.clientHeight / 2;
@@ -701,27 +700,7 @@ function updateWorld(delta) {
 }
 
 function drawWorld() {
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-  ctx.clearRect(0, 0, width, height);
-  const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, '#0a1024');
-  gradient.addColorStop(.55, '#0d1722');
-  gradient.addColorStop(1, '#091019');
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, width, height);
-  ctx.save();
-  ctx.translate(-state.camera.x, -state.camera.y);
-  drawMapBase();
-  drawVehicles();
-  drawWorldRain();
-  drawPickups();
-  drawProjectiles();
-  drawEnemies();
-  drawPlayer();
-  drawParticles();
-  ctx.restore();
-  drawVignette(width, height);
+  renderer3d.render(state);
 }
 
 function drawMapBase() {

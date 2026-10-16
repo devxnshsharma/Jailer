@@ -21,8 +21,8 @@ test('native inventory and scenarios are represented', () => {
   }
 });
 
-test('raw runtime has no external renderer dependency', () => {
+test('raw runtime uses WebGL without an external renderer dependency', () => {
   assert.match(css, /#world/);
-  assert.match(game, /getContext\(['"]2d/);
-  assert.doesNotMatch(game, /THREE|WebGLRenderer|EffectComposer/);
+  assert.match(game, /renderer3d/);
+  assert.doesNotMatch(game, /import[^\n]*from ['"](?:three|vite)/i);
 });
